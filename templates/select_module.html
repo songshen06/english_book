@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Select Module</title>
+    <title>Select a Module</title>
 </head>
 <body>
-    <h2>Select a module to start</h2>
-    <ul>
-        {% for module in modules %}
-        <li><a href="{{ url_for('test', module_name=module) }}">{{ module }}</a></li>
-        {% endfor %}
-    </ul>
+    <h2>Select a Module for {{ session['selected_book'] }}</h2>
+    <form action="{{ url_for('select_module') }}" method="post">
+        <select name="selected_module">
+            {% for module in modules %}
+            <option value="{{ module }}">{{ module }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Start Test">
+    </form>
+    <br>
 </body>
 </html>

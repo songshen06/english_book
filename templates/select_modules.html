@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Select a Module from Book: {{ selected_book }}</h2>
+    <form action="{{ url_for('test', book_name=selected_book) }}" method="post">
+        <div class="form-group">
+            <label for="module_name">Module:</label>
+            <select class="form-control" id="module_name" name="module_name">
+                {% for module in modules %}
+                    <option value="{{ module }}">{{ module }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Start Test</button>
+    </form>
+</div>
+{% endblock %}
