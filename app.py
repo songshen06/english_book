@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
 from words import modules
+from test_utils import check_answer, get_next_word, get_image_path
 from data_recorder import record_data
 
 app = Flask(__name__)
@@ -38,7 +39,7 @@ def test(module_name):
     if 'current_word' not in session or session['current_word'] not in words:
         session['current_word'] = list(words.keys())[0]
     
-    if request.method == 'POST':
+    '''if request.method == 'POST':
         user_input = request.form.get('word_input')
         if user_input == session['current_word']:
             record_data(session['username'], session['current_word'], module_name, True)
@@ -56,9 +57,21 @@ def test(module_name):
                 image_filename = "pics/day.png"
             #image_path = f"./pics/{session['current_word']}.png"
             image_path = url_for('static', filename=image_filename)            
+            return render_template('test.html', word=words[session['current_word']], image_path=image_path)'''
+    if request.method == 'POST':
+        user_input = request.form.get('word_input')
+        if check_answer(user_input, session['current_word']):
+            record_data(session['username'], session['current_word'], module_name, True)
+            next_word = get_next_word(module_name, session['current_word'])
+            if next_word:
+                session['current_word'] = next_word
+            else:
+                return "Module completed!"
+        else:
+            record_data(session['username'], session['current_word'], module_name, False)
+            image_path = get_image_path(session['current_word'])         
             return render_template('test.html', word=words[session['current_word']], image_path=image_path)
     
-
     return render_template('test.html', word=words[session['current_word']])
 
 if __name__ == '__main__':
