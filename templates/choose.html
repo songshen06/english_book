@@ -1,0 +1,14 @@
+...
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% if image_filename %}
+            <img src="{{ url_for('send_image', filename=image_filename) }}" alt="提示图片">
+        {% endif %}
+    {% endif %}
+{% endwith %}
+...

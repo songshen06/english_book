@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Word</title>
+</head>
+<body>
+    <h2>Translate the following word:</h2>
+    <p>{{ word }}</p>
+    <form method="post">
+        <input type="text" name="word_input" required>
+        <button type="submit">Submit</button>
+    </form>
+    {% if image_path %}
+    <img src="{{ image_path }}" alt="Hint">
+    {% endif %}
+</body>
+</html>
