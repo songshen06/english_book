@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Test Word</title>
+    <!-- Add this line to include the JavaScript file for speech -->
+    <script src="{{ url_for('static', filename='speech.js') }}"></script>
 </head>
 <body>
     <h2>Translate the following word:</h2>
@@ -9,6 +11,8 @@
     <form method="post">
         <input type="text" name="word_input" required>
         <button type="submit">Submit</button>
+        <!-- Pronunciation button -->
+        <button type="button" onclick="speakInput()">Pronounce</button>
     </form>
     {% if image_path %}
     <img src="{{ image_path }}" alt="Hint">
