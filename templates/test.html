@@ -4,15 +4,24 @@
     <title>Test Word</title>
     <!-- Add this line to include the JavaScript file for speech -->
     <script src="{{ url_for('static', filename='speech.js') }}"></script>
+    <style>
+        .button-container {
+            margin-top: 10px;  /* 设置按钮与输入框之间的距离 */
+        }
+    </style>
 </head>
 <body>
     <h2>Translate the following word:</h2>
     <p>{{ word }}</p>
     <form method="post">
         <input type="text" name="word_input" required>
-        <button type="submit">Submit</button>
-        <!-- Pronunciation button -->
-        <button type="button" onclick="speakInput()">Pronounce</button>
+        <div class="button-container">
+            <button type="submit">Submit</button>
+            <!-- Pronunciation button -->
+            <button type="button" onclick="speakInput()">Pronounce</button>
+            <button type="button" id="record-button">Record Pronunciation</button>
+            <button type="button" id="skip-button">Skip</button>
+        </div>
     </form>
     {% if image_path %}
     <img src="{{ image_path }}" alt="Hint">
