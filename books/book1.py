@@ -47,7 +47,7 @@ modules = {
         "minute": "分钟",
         "top": "顶部",
         "mountain": "山",
-        "ate": "吃",
+        "ate": "吃（过去时态）",
         "candies": "糖果",
         "plant": "植物",
         "had": "拥有",
