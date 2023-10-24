@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>中文到英文测试</title>
+    <!-- Add this line to include the JavaScript file for speech -->
+    <script src="{{ url_for('static', filename='speech.js') }}"></script>
+    <style>
+        .button-container {
+            margin-top: 10px;  /* 设置按钮与输入框之间的距离 */
+        }
+    </style>
+</head>
+<body>
+    <h2>请将以下中文词汇翻译成英文:</h2>
+    <p>{{ word }}</p>
+    <form method="post" action="{{ url_for('test_cn_to_en') }}">
+        <input type="text" name="word_input" required>
+        <div class="button-container">
+            <button type="submit">提交</button>
+            <!-- Pronunciation button -->
+            <button type="button" onclick="speakInput()">朗读单词</button>
+            <button type="button" id="record-button">发音对比</button>
+        </div>
+    </form>
+    {% if image_path %}
+    <img src="{{ image_path }}" alt="Hint">
+    {% endif %}
+</body>
+</html>

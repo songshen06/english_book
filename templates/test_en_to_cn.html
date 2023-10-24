@@ -1,0 +1,25 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="post">
+    <h2>Translate the following word:</h2>
+    <p>{{ word_en }}</p>
+    <label>
+        <input type="radio" name="word_choice" value="a">{{ choices.a }}
+    </label>
+    <label>
+        <input type="radio" name="word_choice" value="b">{{ choices.b }}
+    </label>
+    <label>
+        <input type="radio" name="word_choice" value="c">{{ choices.c }}
+    </label>
+    <button type="submit">Submit</button>
+</form>
+{% if image_path %}
+    <img src="{{ image_path }}" alt="Hint for {{ word_en }}">
+{% endif %}

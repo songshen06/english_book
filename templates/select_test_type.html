@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Test Type</title>
+</head>
+<body>
+    <h2>Select Test Type</h2>
+    <form action="{{ url_for('select_test_type') }}" method="post">
+        <label>
+            <input type="radio" name="test_type" value="cn_to_en" required> 看中文，写英文
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="test_type" value="en_to_cn"> 看英文，选择中文
+        </label>
+        <br>
+        <button type="submit">Start Test</button>
+    </form>
+</body>
+</html>
