@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Book, Module, and Test Type</title>
+</head>
+<body>
+    <h1>Selection</h1>
+
+    <!-- Book Selection -->
+    <h2>Select a Book</h2>
+    <form action="{{ url_for('select') }}" method="post">
+        {% for book in books %}
+        <label>
+            <input type="radio" name="selected_book" value="{{ book }}" required 
+                   {% if session['selected_book'] == book %} checked {% endif %}> 
+            {{ book }}
+        </label>
+        <br>
+        {% endfor %}
+        <input type="submit" value="Load Modules">
+    </form>
+    <br>
+
+    <!-- Module and Test Type Selection -->
+    <form action="{{ url_for('select') }}" method="post">
+        <h2>Select a Module</h2>
+        {% for module in modules %}
+        <label>
+            <input type="radio" name="selected_module" value="{{ module }}" required>
+            {{ module }}
+        </label>
+        <br>
+        {% endfor %}
+        <br>
+
+        <h2>Select Test Type</h2>
+        <label>
+            <input type="radio" name="test_type" value="cn_to_en" required> 看中文，写英文
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="test_type" value="en_to_cn"> 看英文，选择中文
+        </label>
+        <br><br>
+
+        <input type="submit" value="Start Test">
+    </form>
+
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>

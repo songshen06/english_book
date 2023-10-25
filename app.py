@@ -13,6 +13,58 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # For session management
 
 
+
+@app.route('/')
+def index():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('select'))  # Redirect to the combined selection route
+
+@app.route('/select', methods=['GET', 'POST'])
+def select():
+    # Ensure the user is logged in
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    # Dynamically import all books and their modules
+    BOOKS_MODULES = {}
+    BOOKS_DIR = "books"
+    for book_file in glob.glob(f"{BOOKS_DIR}/book*.py"):
+        book_name = os.path.splitext(os.path.basename(book_file))[0]
+        book_module = importlib.import_module(f"{BOOKS_DIR}.{book_name}")
+        BOOKS_MODULES[book_name] = book_module.modules
+    available_books = list(BOOKS_MODULES.keys())
+    modules = {}
+
+    if request.method == 'POST':
+        selected_book = request.form.get('selected_book')
+        selected_module = request.form.get('selected_module')
+        selected_test_type = request.form.get('test_type')
+
+        # If a book is selected, update the session and load its modules
+        if selected_book in available_books:
+            session['selected_book'] = selected_book
+            modules = BOOKS_MODULES[selected_book]
+            return render_template('select.html', books=available_books, modules=modules.keys())  # Reload with modules
+
+        # If a module and test type is selected, update the session and redirect
+        elif selected_module and selected_test_type:
+            if 'selected_book' in session:
+                modules = BOOKS_MODULES[session['selected_book']]
+                if selected_module in modules:
+                    session['selected_module'] = selected_module
+                    if selected_test_type == "cn_to_en":
+                        return redirect(url_for('test_cn_to_en'))
+                    elif selected_test_type == "en_to_cn":
+                        return redirect(url_for('test_en_to_cn'))
+
+    # If a book is already selected, get its modules
+    elif 'selected_book' in session and session['selected_book'] in BOOKS_MODULES:
+        modules = BOOKS_MODULES[session['selected_book']]
+
+    return render_template('select.html', books=available_books, modules=modules.keys())
+
+'''
 BOOKS_DIR = "books"
 BOOKS_MODULES = {}
 
@@ -22,11 +74,7 @@ for book_file in glob.glob(f"{BOOKS_DIR}/book*.py"):
     book_module = __import__(f"{BOOKS_DIR}.{book_name}", fromlist=[''])
     BOOKS_MODULES[book_name] = book_module.modules
 
-@app.route('/')
-def index():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return render_template('select_book.html', books=BOOKS_MODULES.keys())
+
 
 @app.route('/select_book', methods=['GET', 'POST'])
 def select_book():
@@ -88,7 +136,7 @@ def select_test_type():
 
     return render_template('select_test_type.html')
 
-
+'''
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -120,16 +168,24 @@ def test_cn_to_en():
         return redirect(url_for('login'))
 
     # Check if the book and module are selected
+    #if 'selected_book' not in session or 'selected_module' not in session:
+     #   return redirect(url_for('select_book'))
+
+    # Dynamically import the selected book's module
+    #book_module = importlib.import_module(f"books.{session['selected_book']}")
+    #modules = book_module.modules  # Access the 'modules' dictionary from the imported book module
+
+    # Get the selected module's words
+   # words = modules[session['selected_module']]
     if 'selected_book' not in session or 'selected_module' not in session:
-        return redirect(url_for('select_book'))
+        return redirect(url_for('select'))  # Redirect to combined selection route
 
     # Dynamically import the selected book's module
     book_module = importlib.import_module(f"books.{session['selected_book']}")
-    modules = book_module.modules  # Access the 'modules' dictionary from the imported book module
 
     # Get the selected module's words
-    words = modules[session['selected_module']]
-    print(session)
+    words = book_module.modules[session['selected_module']]  # Directly access the 'modules' dictionary from the imported book module
+    #print(session)
     if 'current_word' not in session or session['current_word'] not in words:
         session['current_word'] = list(words.keys())[0]
     
@@ -157,14 +213,23 @@ def test_en_to_cn():
         return redirect(url_for('login'))
 
     # Check if the book and module are selected
+   # if 'selected_book' not in session or 'selected_module' not in session:
+    #    return redirect(url_for('select_book'))
+
+    # Dynamically import the selected book's module
+    #book_module = importlib.import_module(f"books.{session['selected_book']}")
+    #modules = book_module.modules  # Access the 'modules' dictionary from the imported book module
+
+    #words = dict(modules[session['selected_module']])  # Create a copy to avoid modifying the original
     if 'selected_book' not in session or 'selected_module' not in session:
-        return redirect(url_for('select_book'))
+        return redirect(url_for('select'))  # Redirect to combined selection route
 
     # Dynamically import the selected book's module
     book_module = importlib.import_module(f"books.{session['selected_book']}")
-    modules = book_module.modules  # Access the 'modules' dictionary from the imported book module
 
-    words = dict(modules[session['selected_module']])  # Create a copy to avoid modifying the original
+    # Get the selected module's words
+    words = dict(book_module.modules[session['selected_module']])  # Directly access the 'modules' dictionary from the imported book module
+    print(session)
 # Get a random word from the module
   #  word_en, word_cn = random.choice(list(words.items()))
     if 'word_index' not in session:
@@ -173,8 +238,8 @@ def test_en_to_cn():
     if session['word_index'] < len(word_keys):
         word_en = word_keys[session['word_index']]
         word_cn = words[word_en]
-        print('现在测试的答案是', word_cn)
-        print('english world', word_en)
+        #print('现在测试的答案是', word_cn)
+        #print('english world', word_en)
 
   
 
@@ -186,9 +251,9 @@ def test_en_to_cn():
         if request.method == 'POST':
             choices = session.get('previous_choices')
             user_choice = request.form.get('word_choice')
-            print('use choose abc is ',user_choice)
+            #print('use choose abc is ',user_choice)
             correct_answer = word_cn
-            print('user choice is ',choices[user_choice])
+            #print('user choice is ',choices[user_choice])
             if choices[user_choice] == correct_answer:
                 # 记录正确答案
                 # 这里可以更新session或数据库来记录用户得分
