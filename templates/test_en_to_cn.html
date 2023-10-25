@@ -6,10 +6,10 @@
   {% endif %}
 {% endwith %}
 
-<form method="post">
+<form id="wordChoiceForm" method="post">
     <h2>Translate the following word:</h2>
     <p>{{ word_en }}</p>
-    <button type="button" onclick="speakWord('{{ word_en }}')">朗读单词</button> <!-- 朗读单词按钮 -->
+    <button type="button" onclick="speakWord('{{ word_en }}')">朗读单词</button>
     <br><br>
     <label>
         <input type="radio" name="word_choice" value="a">{{ choices.a }}
@@ -20,7 +20,7 @@
     <label>
         <input type="radio" name="word_choice" value="c">{{ choices.c }}
     </label>
-    <button type="submit">Submit</button>
+    <button type="button" onclick="validateAndSubmit()">Submit</button>
 </form>
 
 {% if image_path %}
@@ -32,5 +32,24 @@
         var synth = window.speechSynthesis;
         var utterThis = new SpeechSynthesisUtterance(word);
         synth.speak(utterThis);
+    }
+
+    function validateAndSubmit() {
+        var radios = document.getElementsByName('word_choice');
+        var formIsValid = false;
+
+        // Check if any radio button is selected
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                formIsValid = true;
+                break;
+            }
+        }
+
+        if (formIsValid) {
+            document.getElementById('wordChoiceForm').submit();
+        } else {
+            alert('Please select an option before submitting!');
+        }
     }
 </script>

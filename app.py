@@ -198,6 +198,7 @@ def test_cn_to_en():
             if current_index + 1 < len(words):
                 session['current_word'] = list(words.keys())[current_index + 1]
             else:
+                session.clear()
                 return "Module completed!"
         else:
             record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False)
@@ -286,6 +287,7 @@ def test_en_to_cn():
             session['previous_choices'] = choices
 
     else:
+        session.clear()
         return "You have completed the module!"
 
     return render_template('test_en_to_cn.html', word_en=word_en, choices=choices)

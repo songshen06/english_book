@@ -42,7 +42,7 @@ modules = {
         "went": "去（过去时态）",
         "saw": "看见（过去时态）",
         "trip": "出行, 旅行",
-        "took": "拿起, 拍摄",
+        "took": "take 的过去式，需要花费",
         "fifty": "五十",
         "minute": "分钟",
         "top": "顶部",
@@ -73,16 +73,16 @@ modules = {
         "magic": "有魔力的",
         "paintbrush": "画笔",
         "woman": "妇女, 女性",
-        "became": "变成",
+        "became": "变成（过去时态）",
         "real": "真实的",
         "bad": "坏的, 不好的",
-        "took": "拿走",
+        "took": "拿走（过去时态）",
         "away": "离去, 离开",
         "leaves": "叶子",
         "only": "只, 仅仅",
         "painting": "画; 画作",
         "angry": "生气的, 愤怒的",
-        "said": "说"
+        "said": "说（过去时态）"
     },
     "Module 7": {
         "doll": "玩偶, 娃娃模特",
