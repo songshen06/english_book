@@ -6,7 +6,7 @@ from data_recorder import record_data
 import glob
 import importlib
 import random
-#import time
+import csv
 
 from database import db, WordRecord,init_db
 
@@ -81,6 +81,8 @@ def select():
                         return redirect(url_for('test_en_to_cn'))
                     elif selected_test_type == "cn_to_m_en":  # 这是新增的逻辑
                         return redirect(url_for('test_cn_to_m_en'))
+                    elif selected_test_type == "test_mode_en_to_cn": # new test mode
+                        return redirect(url_for('test_mode_en_to_cn'))
 
     # If a book is already selected, get its modules
     elif 'selected_book' in session and session['selected_book'] in BOOKS_MODULES:
@@ -393,6 +395,96 @@ def test_cn_to_m_en():
 
     return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
 
+@app.route('/test_mode_en_to_cn', methods=['GET', 'POST'])
+def test_mode_en_to_cn():
+    # Ensure the user is logged in
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'selected_book' not in session or 'selected_module' not in session:
+        return redirect(url_for('select'))
+
+    # Dynamically import the selected book's module
+    book_module = importlib.import_module(f"books.{session['selected_book']}")
+
+    # Get the selected module's words
+    words = dict(book_module.modules[session['selected_module']])
+
+    if 'word_index' not in session:
+        session['word_index'] = 0
+        session['test_results'] = []  # Initialize test results
+    
+    if 'test_results' not in session:
+        session['test_results'] = {}
+
+    word_keys = list(words.keys())
+    if session['word_index'] < len(word_keys):
+        word_en = word_keys[session['word_index']]
+        word_cn = words[word_en]
+
+        del words[word_en]
+
+        if request.method == 'POST':
+            choices = session.get('previous_choices')
+            user_choice = request.form.get('word_choice')
+            correct_answer = word_cn
+
+            result_data = {
+                'word': word_en,
+                'correct': choices[user_choice] == correct_answer
+            }
+            session['test_results'].append(result_data)
+
+            session['word_index'] += 1
+            return redirect(url_for('test_mode_en_to_cn'))
+        else:
+            dummy_choices = random.sample(list(words.values()), 2)
+            dummy_choices.append(word_cn)
+            random.shuffle(dummy_choices)
+
+            choices = {
+                'a': dummy_choices[0],
+                'b': dummy_choices[1],
+                'c': dummy_choices[2]
+            }
+
+            session['previous_choices'] = choices
+    else:
+        correct_answers_count = sum([result['correct'] for result in session['test_results']])
+        total_questions = len(session['test_results'])
+        accuracy = (correct_answers_count / total_questions) * 100
+        
+        correct_answers = [result for result in session['test_results'] if result['correct']]
+        incorrect_answers = [result for result in session['test_results'] if not result['correct']]
+
+        
+        # Clean up session data
+        for key in ['selected_book', 'selected_module', 'word_index', 'test_results']:
+            if key in session:
+                del session[key]
+
+        # Render the test report template with correct and incorrect answers as well as accuracy
+        return render_template('test_report.html', correct_answers=correct_answers, incorrect_answers=incorrect_answers, accuracy=accuracy)
+
+    return render_template('test_mode_en_to_cn.html', word_en=word_en, choices=choices)
+
+
+def get_test_report(username, selected_book, selected_module):
+    correct_words = []
+    incorrect_words = []
+
+    with open('data_records.csv', 'r') as file:
+        records = csv.reader(file)
+        next(records)  # Skip header
+        for record in records:
+            user, word, book, module, result, _ = record
+            if user == username and book == selected_book and module == selected_module:
+                if result == 'True':
+                    correct_words.append(word)
+                else:
+                    incorrect_words.append(word)
+
+    return correct_words, incorrect_words
 @app.cli.command('initdb')
 def initdb_command():
     """Initializes the database."""

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mode: Choose the English Meaning</title>
+</head>
+<body>
+
+<h2>Choose the English word/phrase for: {{ word_en }}</h2>
+
+<form action="{{ url_for('test_mode_en_to_cn') }}" method="post">
+    <label>
+        <input type="radio" name="word_choice" value="a" required>
+        {{ choices['a'] }}
+    </label><br>
+    <label>
+        <input type="radio" name="word_choice" value="b" required>
+        {{ choices['b'] }}
+    </label><br>
+    <label>
+        <input type="radio" name="word_choice" value="c" required>
+        {{ choices['c'] }}
+    </label><br>
+    <input type="submit" value="Next">
+</form>
+
+</body>
+</html>

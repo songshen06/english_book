@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Report</title>
+</head>
+<body>
+    <h1>Test Report</h1>
+    <p>Accuracy: {{ accuracy }}%</p>
+    <h2>Correct Answers:</h2>
+    <ul>
+    {% for result in correct_answers %}
+        <li>{{ result['word'] }}</li>
+    {% endfor %}
+    </ul>
+
+    <h2>Incorrect Answers:</h2>
+    <ul>
+    {% for result in incorrect_answers %}
+        <li>{{ result['word'] }}</li>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('select') }}">Back to Selection</a>
+</body>
+</html>
