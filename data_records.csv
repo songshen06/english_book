@@ -303,3 +303,65 @@ ss,2023-10-25 09:16:47,dear,book1,Module 1,fault
 7,2023-10-25 20:20:42,able,book1,Module 5,correct
 7,2023-10-25 20:20:53,be able to,book1,Module 5,correct
 7,2023-10-25 20:20:58,skate,book1,Module 5,correct
+ss,2023-10-28 17:06:11,went,book1,Module 5,fault
+ss,2023-10-28 17:06:16,went,book1,Module 5,correct
+ss,2023-10-28 17:36:02,invent,book1,Module 4,correct
+ss,2023-10-28 18:37:23,become,book1,Module 6,fault
+ss,2023-10-28 18:55:13,went,book1,Module 5,correct
+ss,2023-10-28 18:59:15,went,book1,Module 5,fault
+ss,2023-10-28 19:05:36,skirt,book1,Module 2,correct
+ss,2023-10-28 19:12:27,become,book1,Module 6,correct
+ss,2023-10-28 19:25:12,invent,book1,Module 4,fault
+ss,2023-10-28 19:25:14,invent,book1,Module 4,correct
+ss,2023-10-29 12:53:54,"发明, 创造",book1,Module 4,fault
+ss,2023-10-29 12:56:01,"发明, 创造",book1,Module 4,fault
+ss,2023-10-29 13:01:57,"发明, 创造",book1,Module 4,correct
+ss,2023-10-29 15:06:45,纸,book1,Module 4,correct
+ss,2023-10-29 15:06:52,重要的,book1,Module 4,fault
+ss,2023-10-29 15:13:57,重要的,book1,Module 4,correct
+ss,2023-10-29 15:14:30,印刷,book1,Module 4,fault
+ss,2023-10-29 15:14:40,印刷,book1,Module 4,correct
+ss,2023-10-29 15:15:18,印刷术,book1,Module 4,correct
+ss,2023-10-29 15:15:25,"正确的, 对的",book1,Module 4,correct
+ss,2023-10-29 15:15:30,在...之间,book1,Module 4,correct
+ss,2023-10-29 15:15:37,自行车,book1,Module 4,correct
+ss,2023-10-29 15:15:46,老鼠,book1,Module 4,correct
+ss,2023-10-29 15:16:18,在...旁边,book1,Module 4,correct
+ss,2023-10-29 15:16:20,男人,book1,Module 4,correct
+7,2023-10-29 19:02:14,去（过去时态）,book1,Module 5,fault
+7,2023-10-29 19:02:18,去（过去时态）,book1,Module 5,correct
+7,2023-10-29 19:02:24,看见（过去时态）,book1,Module 5,fault
+7,2023-10-29 19:02:27,看见（过去时态）,book1,Module 5,correct
+7,2023-10-29 19:02:31,"出行, 旅行",book1,Module 5,fault
+7,2023-10-29 19:02:34,"出行, 旅行",book1,Module 5,correct
+7,2023-10-29 19:02:39,take 的过去式，需要花费,book1,Module 5,correct
+7,2023-10-29 19:02:42,五十,book1,Module 5,correct
+7,2023-10-29 19:02:46,分钟,book1,Module 5,fault
+7,2023-10-29 19:02:49,分钟,book1,Module 5,correct
+7,2023-10-29 19:02:51,顶部,book1,Module 5,correct
+7,2023-10-29 19:02:55,山,book1,Module 5,fault
+7,2023-10-29 19:02:57,山,book1,Module 5,correct
+7,2023-10-29 19:03:08,吃（过去时态）,book1,Module 5,fault
+7,2023-10-29 19:03:12,吃（过去时态）,book1,Module 5,correct
+7,2023-10-29 19:03:16,糖果,book1,Module 5,correct
+7,2023-10-29 19:03:19,植物,book1,Module 5,correct
+7,2023-10-29 19:03:30,拥有,book1,Module 5,correct
+7,2023-10-29 19:03:33,过得很愉快,book1,Module 5,correct
+7,2023-10-29 19:03:35,买,book1,Module 5,fault
+7,2023-10-29 19:03:39,买,book1,Module 5,correct
+7,2023-10-29 19:03:41,穿,book1,Module 5,fault
+7,2023-10-29 19:03:45,穿,book1,Module 5,correct
+7,2023-10-29 19:03:47,去旅行,book1,Module 5,correct
+7,2023-10-29 19:03:57,冰,book1,Module 5,correct
+7,2023-10-29 19:04:00,"起初, 开始时",book1,Module 5,correct
+7,2023-10-29 19:04:04,跌倒,book1,Module 5,correct
+7,2023-10-29 19:04:07,摔倒,book1,Module 5,fault
+7,2023-10-29 19:04:10,摔倒,book1,Module 5,correct
+7,2023-10-29 19:04:14,伤害,book1,Module 5,correct
+7,2023-10-29 19:04:17,"很多, 大量",book1,Module 5,fault
+7,2023-10-29 19:04:19,"很多, 大量",book1,Module 5,correct
+7,2023-10-29 19:04:23,有能力的,book1,Module 5,fault
+7,2023-10-29 19:04:26,有能力的,book1,Module 5,correct
+7,2023-10-29 19:04:30,能够,book1,Module 5,fault
+7,2023-10-29 19:04:40,能够,book1,Module 5,correct
+7,2023-10-29 19:04:49,滑冰,book1,Module 5,correct

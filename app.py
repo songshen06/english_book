@@ -8,11 +8,32 @@ import importlib
 import random
 #import time
 
+from database import db, WordRecord,init_db
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # For session management
 
+# Configure the SQLite database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///testrecord.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
+# Initialize the db with this app
+init_db(app)  # This line ensures db is initialized with the app
+
+def record_to_db(username, word, book_name, module, is_correct, test_type):
+    print("recodrding data in DB")
+    record = WordRecord(
+        student_name=username,
+        word=word,
+        book_name=book_name,
+        module=module,
+        is_correct=is_correct,
+        test_type=test_type
+    )
+    db.session.add(record)
+    db.session.commit()
 
 @app.route('/')
 def index():
@@ -47,6 +68,7 @@ def select():
             modules = BOOKS_MODULES[selected_book]
             return render_template('select.html', books=available_books, modules=modules.keys())  # Reload with modules
 
+
         # If a module and test type is selected, update the session and redirect
         elif selected_module and selected_test_type:
             if 'selected_book' in session:
@@ -57,12 +79,15 @@ def select():
                         return redirect(url_for('test_cn_to_en'))
                     elif selected_test_type == "en_to_cn":
                         return redirect(url_for('test_en_to_cn'))
+                    elif selected_test_type == "cn_to_m_en":  # 这是新增的逻辑
+                        return redirect(url_for('test_cn_to_m_en'))
 
     # If a book is already selected, get its modules
     elif 'selected_book' in session and session['selected_book'] in BOOKS_MODULES:
         modules = BOOKS_MODULES[session['selected_book']]
 
     return render_template('select.html', books=available_books, modules=modules.keys())
+
 
 '''
 BOOKS_DIR = "books"
@@ -156,6 +181,15 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/video_list')
+def video_list():
+    video_files = [f for f in os.listdir('static/videos') if f.endswith('.mp4')]
+    return render_template('video_list.html', video_files=video_files)
+
+@app.route('/play_video/<filename>')
+def play_video(filename):
+    return render_template('play_video.html', video_file=url_for('static', filename=f'videos/{filename}'))
+
 
 
 
@@ -194,6 +228,7 @@ def test_cn_to_en():
         user_input = request.form.get('word_input')
         if check_answer(user_input, session['current_word']):
             record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True)
+            record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True, "cn_to_en")
             current_index = list(words.keys()).index(session['current_word'])
             if current_index + 1 < len(words):
                 session['current_word'] = list(words.keys())[current_index + 1]
@@ -202,6 +237,7 @@ def test_cn_to_en():
                 return "Module completed!"
         else:
             record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False)
+            record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False, "cn_to_en")
             image_path = get_image_path(session['current_word'])         
             return render_template('test_cn_to_en.html', word=words[session['current_word']], image_path=image_path)
     
@@ -230,7 +266,7 @@ def test_en_to_cn():
 
     # Get the selected module's words
     words = dict(book_module.modules[session['selected_module']])  # Directly access the 'modules' dictionary from the imported book module
-    print(session)
+    #print(session)
 # Get a random word from the module
   #  word_en, word_cn = random.choice(list(words.items()))
     if 'word_index' not in session:
@@ -260,6 +296,7 @@ def test_en_to_cn():
                 # 这里可以更新session或数据库来记录用户得分
                 flash('Correct!', 'success')
                 record_data(session['username'], word_en, session['selected_book'], session['selected_module'], True)
+                record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], True, "en_to_cn")
                 
             else:
                 # 记录错误答案
@@ -267,6 +304,7 @@ def test_en_to_cn():
                 #wrong_answer = True 
                 flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
                 record_data(session['username'], word_en, session['selected_book'], session['selected_module'], False)
+                record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], False, "en_to_cn")
                 image_path = get_image_path(word_en)         
                 return render_template('test_en_to_cn.html', word_en=word_en, choices=choices, image_path=image_path)
             session['word_index'] += 1
@@ -283,7 +321,7 @@ def test_en_to_cn():
                 'b': dummy_choices[1],
                 'c': dummy_choices[2]
             }
-            print(choices)
+            #print(choices)
             session['previous_choices'] = choices
 
     else:
@@ -292,6 +330,74 @@ def test_en_to_cn():
 
     return render_template('test_en_to_cn.html', word_en=word_en, choices=choices)
 
+@app.route('/test_cn_to_m_en', methods=['GET', 'POST'])
+def test_cn_to_m_en():
+    # Ensure the user is logged in
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'selected_book' not in session or 'selected_module' not in session:
+        return redirect(url_for('select'))
+
+    # Dynamically import the selected book's module
+    book_module = importlib.import_module(f"books.{session['selected_book']}")
+
+    # Get the selected module's words
+    words = dict(book_module.modules[session['selected_module']])
+
+    if 'word_index' not in session:
+        session['word_index'] = 0
+    word_keys = list(words.values())
+    if session['word_index'] < len(word_keys):
+        word_cn = word_keys[session['word_index']]
+        word_en = list(words.keys())[list(words.values()).index(word_cn)]
+
+        # Remove the correct answer from words
+        words = {v: k for k, v in words.items()}
+        del words[word_cn]
+
+        if request.method == 'POST':
+            choices = session.get('previous_choices')
+            user_choice = request.form.get('word_choice')
+            correct_answer = word_en
+            if choices[user_choice] == correct_answer:
+                flash('Correct!', 'success')
+                record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], True)
+                record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], True, "cn_to_m_en")
+            else:
+                flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
+                record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], False)
+                record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], False, "cn_to_m_en")
+                return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
+            session['word_index'] += 1
+            return redirect(url_for('test_cn_to_m_en'))
+        else:
+            # Generate dummy choices
+            dummy_choices = random.sample(list(words.values()), 2)
+            dummy_choices.append(word_en)
+            random.shuffle(dummy_choices)
+
+            choices = {
+                'a': dummy_choices[0],
+                'b': dummy_choices[1],
+                'c': dummy_choices[2]
+            }
+            session['previous_choices'] = choices
+
+    else:
+        for key in ['selected_book', 'selected_module', 'word_index']:
+            if key in session:
+                del session[key]
+        flash("You have completed the module!")
+        return redirect(url_for('select'))
+
+    return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
+
+@app.cli.command('initdb')
+def initdb_command():
+    """Initializes the database."""
+    init_db(app)
+    print('Initialized the database.')
 
 if __name__ == '__main__':
     app.run(debug=True,port=8080)
