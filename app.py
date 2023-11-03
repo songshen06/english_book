@@ -2,38 +2,25 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import os
 #from words import modules
 from test_utils import check_answer, get_next_word, get_image_path
-from data_recorder import record_data
+from data_recorder import record_data,record_result
 import glob
 import importlib
 import random
 import csv
 
-from database import db, WordRecord,init_db
+from database import db, init_db
 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # For session management
 
-# Configure the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///testrecord.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+db.init_app(app)
 
-
-# Initialize the db with this app
-init_db(app)  # This line ensures db is initialized with the app
-
-def record_to_db(username, word, book_name, module, is_correct, test_type):
-    print("recodrding data in DB")
-    record = WordRecord(
-        student_name=username,
-        word=word,
-        book_name=book_name,
-        module=module,
-        is_correct=is_correct,
-        test_type=test_type
-    )
-    db.session.add(record)
-    db.session.commit()
+# 创建数据库和表
+with app.app_context():
+    db.drop_all()  # 先删除所有旧的表结构
+    db.create_all()  # 创建新的表结构
 
 @app.route('/')
 def index():
@@ -83,7 +70,9 @@ def select():
                         return redirect(url_for('test_cn_to_m_en'))
                     elif selected_test_type == "test_mode_en_to_cn": # new test mode
                         return redirect(url_for('test_mode_en_to_cn'))
-
+                    elif selected_test_type == "retest_mode_en_to_cn": # new test mode
+                        return redirect(url_for('retest_mode_en_to_cn'))
+                    
     # If a book is already selected, get its modules
     elif 'selected_book' in session and session['selected_book'] in BOOKS_MODULES:
         modules = BOOKS_MODULES[session['selected_book']]
@@ -230,7 +219,7 @@ def test_cn_to_en():
         user_input = request.form.get('word_input')
         if check_answer(user_input, session['current_word']):
             record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True)
-            record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True, "cn_to_en")
+            #record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True, "cn_to_en")
             current_index = list(words.keys()).index(session['current_word'])
             if current_index + 1 < len(words):
                 session['current_word'] = list(words.keys())[current_index + 1]
@@ -239,7 +228,7 @@ def test_cn_to_en():
                 return "Module completed!"
         else:
             record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False)
-            record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False, "cn_to_en")
+            #record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False, "cn_to_en")
             image_path = get_image_path(session['current_word'])         
             return render_template('test_cn_to_en.html', word=words[session['current_word']], image_path=image_path)
     
@@ -298,7 +287,7 @@ def test_en_to_cn():
                 # 这里可以更新session或数据库来记录用户得分
                 flash('Correct!', 'success')
                 record_data(session['username'], word_en, session['selected_book'], session['selected_module'], True)
-                record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], True, "en_to_cn")
+                #record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], True, "en_to_cn")
                 
             else:
                 # 记录错误答案
@@ -306,7 +295,7 @@ def test_en_to_cn():
                 #wrong_answer = True 
                 flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
                 record_data(session['username'], word_en, session['selected_book'], session['selected_module'], False)
-                record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], False, "en_to_cn")
+                #record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], False, "en_to_cn")
                 image_path = get_image_path(word_en)         
                 return render_template('test_en_to_cn.html', word_en=word_en, choices=choices, image_path=image_path)
             session['word_index'] += 1
@@ -365,11 +354,11 @@ def test_cn_to_m_en():
             if choices[user_choice] == correct_answer:
                 flash('Correct!', 'success')
                 record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], True)
-                record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], True, "cn_to_m_en")
+                #record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], True, "cn_to_m_en")
             else:
                 flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
                 record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], False)
-                record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], False, "cn_to_m_en")
+                #record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], False, "cn_to_m_en")
                 return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
             session['word_index'] += 1
             return redirect(url_for('test_cn_to_m_en'))
@@ -415,7 +404,8 @@ def test_mode_en_to_cn():
         session['test_results'] = []  # Initialize test results
     
     if 'test_results' not in session:
-        session['test_results'] = {}
+       # session['test_results'] = {}
+       session['test_results'] = []
 
     word_keys = list(words.keys())
     if session['word_index'] < len(word_keys):
@@ -452,11 +442,18 @@ def test_mode_en_to_cn():
     else:
         correct_answers_count = sum([result['correct'] for result in session['test_results']])
         total_questions = len(session['test_results'])
-        accuracy = (correct_answers_count / total_questions) * 100
-        
+        #accuracy = (correct_answers_count / total_questions) * 100
+        accuracy = int((correct_answers_count / total_questions) * 100)
         correct_answers = [result for result in session['test_results'] if result['correct']]
         incorrect_answers = [result for result in session['test_results'] if not result['correct']]
+        #print(incorrect_answers)
+        #incorrect_words = [result['word'] for result in incorrect_answers]
 
+# 如果你想将这些单词记录到数据库，你可以遍历 incorrect_words 列表，并为每个单词调用你的记录函数。
+        #for word in incorrect_words:
+    # 假设 record_word 是你用来记录单词到数据库的函数
+            
+        record_result(session['username'], session['selected_book'], session['selected_module'],accuracy )
         
         # Clean up session data
         for key in ['selected_book', 'selected_module', 'word_index', 'test_results']:
@@ -467,6 +464,86 @@ def test_mode_en_to_cn():
         return render_template('test_report.html', correct_answers=correct_answers, incorrect_answers=incorrect_answers, accuracy=accuracy)
 
     return render_template('test_mode_en_to_cn.html', word_en=word_en, choices=choices)
+
+@app.route('/retest_mode_en_to_cn', methods=['GET', 'POST'])
+def retest_mode_en_to_cn():
+    # 保证用户已登录
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'selected_book' not in session or 'selected_module' not in session:
+        return redirect(url_for('select'))
+
+    # 动态导入所选书的模块
+    book_module = importlib.import_module(f"books.{session['selected_book']}")
+
+    # 获取所选模块的单词
+    words = dict(book_module.modules[session['selected_module']])
+
+    # 初始化 session 数据
+    if 'incorrect_words' not in session :  # 检查incorrect_words是否存在
+        session['incorrect_words'] = list(words.keys())  # 如果是，将其初始化为所有英文单词
+        session['retest_results'] = []
+        session['word_index'] = 0
+
+    word_en = session['incorrect_words'][session['word_index']]
+    word_cn = words[word_en]
+    #print(word_en)
+    #print(word_cn)
+    if request.method == 'POST':
+        choices = session.get('previous_choices')
+        user_choice = request.form.get('word_choice')
+        correct_answer = word_cn
+
+        #result_data = {
+        #    'word': word_en,
+        #    'correct': choices[user_choice] == correct_answer
+        #}
+        #session['retest_results'].append(result_data)
+
+        if choices[user_choice] == correct_answer:  # 如果选择正确，从incorrect_words列表中移除该单词
+            session['incorrect_words'].pop(session['word_index'])
+    # 更新或重置 word_index
+            if session['incorrect_words']:  # 如果列表中还有单词
+                session['word_index'] = session['word_index'] % len(session['incorrect_words'])  # 更新 word_index
+            else:
+                for key in ['incorrect_words', 'retest_results', 'word_index', 'previous_choices']:
+                    if key in session:
+                        del session[key]
+                return redirect(url_for('retest_results'))
+                
+        else:
+            session['word_index'] = (session['word_index'] + 1) % len(session['incorrect_words'])  # 如果选择错误，移到下一个单词
+
+        return redirect(url_for('retest_mode_en_to_cn'))
+    else:
+        # 从字典中移除正确的答案，以确保不会被选为干扰项
+        words_without_correct = {k: v for k, v in words.items() if v != word_cn}
+        
+        # 确保所有选项都是唯一的
+        while True:
+            dummy_choices = random.sample(list(words_without_correct.values()), 2)
+            if dummy_choices[0] != word_cn and dummy_choices[1] != word_cn:
+                break  # 如果干扰选项都是唯一的，并且不包含正确答案，则退出循环
+        
+        dummy_choices.append(word_cn)  # 添加正确答案
+        random.shuffle(dummy_choices)  # 随机打乱选项顺序
+
+        choices = {
+            'a': dummy_choices[0],
+            'b': dummy_choices[1],
+            'c': dummy_choices[2]
+        }
+
+        session['previous_choices'] = choices
+
+    return render_template('retest_mode_en_to_cn.html', word_en=word_en, choices=choices)  # 渲染测试模式模板
+
+@app.route('/retest_results')
+def retest_results():
+    selected_book = session.get('selected_book', 'Unknown Book')
+    selected_module = session.get('selected_module', 'Unknown Module')
+    return render_template('retest_results.html', selected_book=selected_book, selected_module=selected_module)
 
 
 def get_test_report(username, selected_book, selected_module):
