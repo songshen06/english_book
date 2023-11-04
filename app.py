@@ -316,8 +316,8 @@ def test_en_to_cn():
             session['previous_choices'] = choices
 
     else:
-        session.clear()
-        return "You have completed the module!"
+        return redirect(url_for('learning_results'))
+      
 
     return render_template('test_en_to_cn.html', word_en=word_en, choices=choices)
 
@@ -543,7 +543,15 @@ def retest_mode_en_to_cn():
 def retest_results():
     selected_book = session.get('selected_book', 'Unknown Book')
     selected_module = session.get('selected_module', 'Unknown Module')
+    record_result(session['username'], session['selected_book'], session['selected_module'],'200' )
     return render_template('retest_results.html', selected_book=selected_book, selected_module=selected_module)
+
+@app.route('/learning_results')
+def learning_results():
+    selected_book = session.get('selected_book', 'Unknown Book')
+    selected_module = session.get('selected_module', 'Unknown Module')
+    session.clear()
+    return render_template('learning_results.html', selected_book=selected_book, selected_module=selected_module)
 
 
 def get_test_report(username, selected_book, selected_module):
