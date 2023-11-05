@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
 #from words import modules
-from test_utils import check_answer, get_next_word, get_image_path
+from test_utils import check_answer, get_image_path
 from data_recorder import record_data,record_result
 import glob
 import importlib
