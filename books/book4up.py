@@ -39,8 +39,8 @@ modules = {
         'man': '男人',
     },
     'Module 5':{
-        "went": "去（过去时态）",
-        "saw": "看见（过去时态）",
+        "went": "去（go过去时态）",
+        "saw": "看见（see过去时态）",
         "trip": "出行, 旅行",
         "took": "take 的过去式，需要花费",
         "fifty": "五十",
@@ -73,16 +73,16 @@ modules = {
         "magic": "有魔力的",
         "paintbrush": "画笔",
         "woman": "妇女, 女性",
-        "became": "变成（过去时态）",
+        "became": "变成（become过去时态）",
         "real": "真实的",
         "bad": "坏的, 不好的",
-        "took": "拿走（过去时态）",
+        "took": "拿走（take过去时态）",
         "away": "离去, 离开",
         "leaves": "叶子",
         "only": "只, 仅仅",
         "painting": "画; 画作",
         "angry": "生气的, 愤怒的",
-        "said": "说（过去时态）"
+        "said": "说（say过去时态）"
     },
     "Module 7": {
         "doll": "玩偶, 娃娃模特",
@@ -119,6 +119,18 @@ modules = {
         "cut": "（cut 的过去时态）切, 割",
         "finger": "手指"
     },
+        "Module Number": {
+    'eleven': 11,
+    'twelve': 12,
+    'thirteen': 13,
+    'fourteen': 14,
+    'fifteen': 15,
+    'sixteen': 16,
+    'seventeen': 17,
+    'eighteen': 18,
+    'nineteen': 19,
+    'twenty': 20
+},
     "Module 10": {
         "early": "早",
         "every": "每个, 每一",

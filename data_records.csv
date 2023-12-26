@@ -578,3 +578,235 @@ ss,2023-11-04 20:53:20,tell,book1,Module 1,correct
 ss,2023-11-04 20:53:22,love,book1,Module 1,correct
 ss,2023-11-05 15:29:58,happen,book4up,Module 9,fault
 ss,2023-11-05 15:31:16,happen,book4up,Module 9,fault
+ss,2023-11-07 13:36:26,become,book4up,Module 6,fault
+ss,2023-11-07 13:36:36,become,book4up,Module 6,correct
+7,2023-12-02 10:49:21,doll,book4up,Module 7,correct
+7,2023-12-02 10:49:27,matter,book4up,Module 7,fault
+7,2023-12-02 10:49:33,matter,book4up,Module 7,correct
+7,2023-12-02 10:49:38,lost,book4up,Module 7,correct
+7,2023-12-02 10:49:43,found,book4up,Module 7,correct
+7,2023-12-02 10:49:48,key,book4up,Module 7,correct
+7,2023-12-02 10:49:53,look for,book4up,Module 7,correct
+7,2023-12-02 10:51:49,become,book4up,Module 6,fault
+7,2023-12-02 10:51:55,become,book4up,Module 6,fault
+7,2023-12-02 10:51:59,become,book4up,Module 6,correct
+7,2023-12-02 10:52:02,gold,book4up,Module 6,correct
+7,2023-12-02 10:52:06,ago,book4up,Module 6,fault
+7,2023-12-02 10:52:10,ago,book4up,Module 6,correct
+7,2023-12-02 10:52:16,long ago,book4up,Module 6,correct
+7,2023-12-02 10:52:19,magic,book4up,Module 6,correct
+7,2023-12-02 10:52:23,paintbrush,book4up,Module 6,correct
+7,2023-12-02 10:52:26,woman,book4up,Module 6,correct
+7,2023-12-02 10:52:29,became,book4up,Module 6,correct
+7,2023-12-02 10:52:32,real,book4up,Module 6,correct
+7,2023-12-02 10:52:35,bad,book4up,Module 6,correct
+7,2023-12-02 10:52:39,took,book4up,Module 6,correct
+7,2023-12-02 10:52:54,away,book4up,Module 6,correct
+7,2023-12-02 10:52:57,leaves,book4up,Module 6,fault
+7,2023-12-02 10:53:00,leaves,book4up,Module 6,correct
+7,2023-12-02 10:53:04,only,book4up,Module 6,correct
+7,2023-12-02 10:53:08,painting,book4up,Module 6,correct
+7,2023-12-02 10:53:11,angry,book4up,Module 6,correct
+7,2023-12-02 10:53:18,said,book4up,Module 6,correct
+7,2023-12-02 10:54:23,become,book4up,Module 6,fault
+7,2023-12-02 10:54:26,become,book4up,Module 6,fault
+7,2023-12-02 10:55:07,become,book4up,Module 6,fault
+7,2023-12-02 10:55:28,become,book4up,Module 6,fault
+7,2023-12-17 09:06:21,when,book4up,Module 8,correct
+7,2023-12-17 09:06:34,came,book4up,Module 8,fault
+7,2023-12-17 09:07:01,came,book4up,Module 8,fault
+7,2023-12-17 09:07:03,came,book4up,Module 8,correct
+7,2023-12-17 09:07:16,competition,book4up,Module 8,fault
+7,2023-12-17 09:07:22,competition,book4up,Module 8,correct
+7,2023-12-17 09:07:33,won,book4up,Module 8,fault
+7,2023-12-17 09:07:37,won,book4up,Module 8,correct
+7,2023-12-17 09:07:43,gold,book4up,Module 8,correct
+7,2023-12-17 09:07:52,cup,book4up,Module 8,fault
+7,2023-12-17 09:08:32,cup,book4up,Module 8,correct
+7,2023-12-17 09:08:39,flute,book4up,Module 8,correct
+7,2023-12-17 09:08:42,practise,book4up,Module 8,fault
+7,2023-12-17 09:08:46,practise,book4up,Module 8,correct
+7,2023-12-17 09:08:50,took,book4up,Module 8,correct
+7,2023-12-17 09:08:55,look,book4up,Module 8,correct
+7,2023-12-17 09:09:06,a lot,book4up,Module 8,correct
+666,2023-12-17 09:12:52,happen,book4up,Module 9,correct
+666,2023-12-17 09:13:01,fall off,book4up,Module 9,fault
+666,2023-12-17 09:13:31,fall off,book4up,Module 9,correct
+666,2023-12-17 09:13:35,bike ride,book4up,Module 9,correct
+666,2023-12-17 09:13:39,thirsty,book4up,Module 9,correct
+666,2023-12-17 09:13:44,water,book4up,Module 9,correct
+666,2023-12-17 09:13:47,watermelon,book4up,Module 9,correct
+666,2023-12-17 09:13:53,carried,book4up,Module 9,correct
+666,2023-12-17 09:13:58,bump,book4up,Module 9,fault
+666,2023-12-17 09:14:40,bump,book4up,Module 9,correct
+666,2023-12-17 09:14:45,hurt,book4up,Module 9,correct
+666,2023-12-17 09:14:50,knee,book4up,Module 9,correct
+666,2023-12-17 09:14:56,cut,book4up,Module 9,correct
+666,2023-12-17 09:14:58,finger,book4up,Module 9,correct
+ss,2023-12-25 19:10:19,dear,book4up,Module 1,correct
+ss,2023-12-25 19:10:31,well,book4up,Module 1,fault
+ss,2023-12-25 19:10:37,well,book4up,Module 1,correct
+ss,2023-12-25 19:10:43,of,book4up,Module 1,fault
+ss,2023-12-25 19:10:50,of,book4up,Module 1,correct
+ss,2023-12-25 19:11:09,soon,book4up,Module 1,correct
+ss,2023-12-25 19:11:15,tell,book4up,Module 1,correct
+ss,2023-12-25 19:11:20,love,book4up,Module 1,correct
+7,2023-12-25 19:12:18,skirt,book4up,Module 2,correct
+7,2023-12-25 19:12:31,clean,book4up,Module 2,correct
+7,2023-12-25 19:13:04,finish,book4up,Module 2,fault
+7,2023-12-25 19:13:11,finish,book4up,Module 2,fault
+7,2023-12-25 19:13:15,finish,book4up,Module 2,correct
+7,2023-12-25 19:13:19,dirty,book4up,Module 2,correct
+7,2023-12-25 19:13:22,paint,book4up,Module 2,correct
+7,2023-12-25 19:13:26,Mr,book4up,Module 2,correct
+7,2023-12-25 19:13:32,phone,book4up,Module 2,correct
+7,2023-12-25 19:14:16,didn't,book4up,Module 3,correct
+7,2023-12-25 19:14:21,National Day,book4up,Module 3,correct
+7,2023-12-25 19:14:34,stay,book4up,Module 3,correct
+7,2023-12-25 19:14:42,what,book4up,Module 3,fault
+7,2023-12-25 19:14:46,what,book4up,Module 3,correct
+7,2023-12-25 19:14:53,boring,book4up,Module 3,fault
+7,2023-12-25 19:14:58,boring,book4up,Module 3,correct
+7,2023-12-25 19:15:01,day,book4up,Module 3,correct
+7,2023-12-25 19:15:38,invent,book4up,Module 4,fault
+7,2023-12-25 19:15:41,invent,book4up,Module 4,correct
+7,2023-12-25 19:15:45,paper,book4up,Module 4,correct
+7,2023-12-25 19:15:49,important,book4up,Module 4,correct
+7,2023-12-25 19:15:53,print,book4up,Module 4,correct
+7,2023-12-25 19:16:11,printing,book4up,Module 4,correct
+7,2023-12-25 19:16:15,right,book4up,Module 4,correct
+7,2023-12-25 19:16:19,between,book4up,Module 4,correct
+7,2023-12-25 19:16:23,bicycle,book4up,Module 4,fault
+7,2023-12-25 19:16:58,bicycle,book4up,Module 4,correct
+7,2023-12-25 19:17:02,mouse,book4up,Module 4,correct
+7,2023-12-25 19:17:06,beside,book4up,Module 4,correct
+7,2023-12-25 19:17:08,man,book4up,Module 4,correct
+7,2023-12-25 19:17:41,went,book4up,Module 5,correct
+7,2023-12-25 19:17:45,saw,book4up,Module 5,fault
+7,2023-12-25 19:17:56,saw,book4up,Module 5,correct
+7,2023-12-25 19:18:00,trip,book4up,Module 5,fault
+7,2023-12-25 19:18:03,trip,book4up,Module 5,correct
+7,2023-12-25 19:18:07,took,book4up,Module 5,correct
+7,2023-12-25 19:18:11,fifty,book4up,Module 5,correct
+7,2023-12-25 19:18:14,minute,book4up,Module 5,correct
+7,2023-12-25 19:18:17,top,book4up,Module 5,correct
+7,2023-12-25 19:18:20,mountain,book4up,Module 5,correct
+7,2023-12-25 19:18:22,ate,book4up,Module 5,correct
+7,2023-12-25 19:18:25,candies,book4up,Module 5,correct
+7,2023-12-25 19:18:29,plant,book4up,Module 5,fault
+7,2023-12-25 19:18:33,plant,book4up,Module 5,correct
+7,2023-12-25 19:18:37,had,book4up,Module 5,correct
+7,2023-12-25 19:18:41,have a good time,book4up,Module 5,correct
+7,2023-12-25 19:18:45,bought,book4up,Module 5,correct
+7,2023-12-25 19:18:47,wore,book4up,Module 5,correct
+7,2023-12-25 19:18:50,go on a trip,book4up,Module 5,fault
+7,2023-12-25 19:18:54,go on a trip,book4up,Module 5,correct
+7,2023-12-25 19:19:00,ice,book4up,Module 5,correct
+7,2023-12-25 19:19:04,at first,book4up,Module 5,correct
+7,2023-12-25 19:19:07,fell,book4up,Module 5,correct
+7,2023-12-25 19:19:10,fall over,book4up,Module 5,correct
+7,2023-12-25 19:19:12,hurt,book4up,Module 5,correct
+7,2023-12-25 19:19:17,a lot,book4up,Module 5,correct
+7,2023-12-25 19:19:22,able,book4up,Module 5,correct
+7,2023-12-25 19:19:25,be able to,book4up,Module 5,correct
+7,2023-12-25 19:19:29,skate,book4up,Module 5,correct
+7,2023-12-25 19:20:04,become,book4up,Module 6,correct
+7,2023-12-25 19:20:06,gold,book4up,Module 6,correct
+7,2023-12-25 19:20:10,ago,book4up,Module 6,correct
+7,2023-12-25 19:20:18,long ago,book4up,Module 6,correct
+7,2023-12-25 19:20:21,magic,book4up,Module 6,correct
+7,2023-12-25 19:20:25,paintbrush,book4up,Module 6,correct
+7,2023-12-25 19:20:27,woman,book4up,Module 6,correct
+7,2023-12-25 19:20:37,became,book4up,Module 6,fault
+7,2023-12-25 19:20:47,became,book4up,Module 6,correct
+7,2023-12-25 19:20:51,real,book4up,Module 6,fault
+7,2023-12-25 19:20:53,real,book4up,Module 6,correct
+7,2023-12-25 19:20:56,bad,book4up,Module 6,correct
+7,2023-12-25 19:21:00,took,book4up,Module 6,correct
+7,2023-12-25 19:21:03,away,book4up,Module 6,fault
+7,2023-12-25 19:21:07,away,book4up,Module 6,correct
+7,2023-12-25 19:21:10,leaves,book4up,Module 6,fault
+7,2023-12-25 19:21:13,leaves,book4up,Module 6,correct
+7,2023-12-25 19:21:18,only,book4up,Module 6,fault
+7,2023-12-25 19:21:23,only,book4up,Module 6,correct
+7,2023-12-25 19:21:27,painting,book4up,Module 6,correct
+7,2023-12-25 19:22:19,angry,book4up,Module 6,correct
+7,2023-12-25 19:22:24,said,book4up,Module 6,correct
+7,2023-12-25 19:22:46,doll,book4up,Module 7,correct
+7,2023-12-25 19:22:53,matter,book4up,Module 7,fault
+7,2023-12-25 19:22:56,matter,book4up,Module 7,correct
+7,2023-12-25 19:22:59,lost,book4up,Module 7,fault
+7,2023-12-25 19:23:14,lost,book4up,Module 7,correct
+7,2023-12-25 19:23:18,found,book4up,Module 7,fault
+7,2023-12-25 19:23:24,found,book4up,Module 7,correct
+7,2023-12-25 19:23:30,key,book4up,Module 7,correct
+7,2023-12-25 19:23:35,look for,book4up,Module 7,fault
+7,2023-12-25 19:23:39,look for,book4up,Module 7,correct
+7,2023-12-25 19:24:00,when,book4up,Module 8,correct
+7,2023-12-25 19:24:05,came,book4up,Module 8,fault
+7,2023-12-25 19:24:14,came,book4up,Module 8,correct
+7,2023-12-25 19:24:19,competition,book4up,Module 8,fault
+7,2023-12-25 19:24:25,competition,book4up,Module 8,correct
+7,2023-12-25 19:24:38,won,book4up,Module 8,fault
+7,2023-12-25 19:24:42,won,book4up,Module 8,correct
+7,2023-12-25 19:24:45,gold,book4up,Module 8,correct
+7,2023-12-25 19:24:49,cup,book4up,Module 8,correct
+7,2023-12-25 19:24:53,flute,book4up,Module 8,fault
+7,2023-12-25 19:24:59,flute,book4up,Module 8,correct
+7,2023-12-25 19:25:03,practise,book4up,Module 8,fault
+7,2023-12-25 19:25:07,practise,book4up,Module 8,correct
+7,2023-12-25 19:25:27,took,book4up,Module 8,correct
+7,2023-12-25 19:25:44,look,book4up,Module 8,fault
+7,2023-12-25 19:25:56,look,book4up,Module 8,correct
+7,2023-12-25 19:26:00,a lot,book4up,Module 8,correct
+7,2023-12-25 19:26:20,happen,book4up,Module 9,fault
+7,2023-12-25 19:26:51,happen,book4up,Module 9,correct
+7,2023-12-25 19:27:02,fall off,book4up,Module 9,correct
+7,2023-12-25 19:27:05,bike ride,book4up,Module 9,correct
+7,2023-12-25 19:27:10,thirsty,book4up,Module 9,fault
+7,2023-12-25 19:27:16,thirsty,book4up,Module 9,correct
+7,2023-12-25 19:27:19,water,book4up,Module 9,correct
+7,2023-12-25 19:27:22,watermelon,book4up,Module 9,correct
+7,2023-12-25 19:27:28,carried,book4up,Module 9,correct
+7,2023-12-25 19:27:34,bump,book4up,Module 9,correct
+7,2023-12-25 19:27:39,hurt,book4up,Module 9,fault
+7,2023-12-25 19:27:44,hurt,book4up,Module 9,correct
+7,2023-12-25 19:27:48,knee,book4up,Module 9,correct
+7,2023-12-25 19:27:51,cut,book4up,Module 9,correct
+7,2023-12-25 19:27:54,finger,book4up,Module 9,correct
+098t,2023-12-25 19:28:18,early,book4up,Module 10,correct
+098t,2023-12-25 19:28:22,every,book4up,Module 10,correct
+098t,2023-12-25 19:28:26,during,book4up,Module 10,fault
+098t,2023-12-25 19:28:31,during,book4up,Module 10,correct
+098t,2023-12-25 19:28:35,computer game,book4up,Module 10,correct
+098t,2023-12-25 19:28:41,take,book4up,Module 10,correct
+098t,2023-12-25 19:28:44,medicine,book4up,Module 10,fault
+098t,2023-12-25 19:28:47,medicine,book4up,Module 10,correct
+098t,2023-12-25 19:28:55,a lot of,book4up,Module 10,correct
+098t,2023-12-25 19:29:00,exercise,book4up,Module 10,fault
+098t,2023-12-25 19:29:04,exercise,book4up,Module 10,fault
+098t,2023-12-25 19:29:10,exercise,book4up,Module 10,fault
+098t,2023-12-25 19:29:16,exercise,book4up,Module 10,correct
+098t,2023-12-25 19:29:19,salad,book4up,Module 10,correct
+098t,2023-12-25 19:29:22,healthy,book4up,Module 10,fault
+098t,2023-12-25 19:29:26,healthy,book4up,Module 10,correct
+098t,2023-12-25 19:29:28,juice,book4up,Module 10,correct
+098t,2023-12-25 19:29:34,before,book4up,Module 10,fault
+098t,2023-12-25 19:29:49,before,book4up,Module 10,correct
+098t,2023-12-25 19:29:52,after,book4up,Module 10,fault
+098t,2023-12-25 19:29:58,after,book4up,Module 10,correct
+098t,2023-12-25 19:30:02,toilet,book4up,Module 10,fault
+098t,2023-12-25 19:30:07,toilet,book4up,Module 10,correct
+7,2023-12-25 19:33:16,doll,book4up,Module 7,correct
+7,2023-12-25 19:33:22,matter,book4up,Module 7,fault
+7,2023-12-25 19:33:32,matter,book4up,Module 7,correct
+7,2023-12-25 19:33:36,lost,book4up,Module 7,correct
+7,2023-12-25 19:33:41,found,book4up,Module 7,correct
+7,2023-12-25 19:33:46,key,book4up,Module 7,correct
+7,2023-12-25 19:33:51,look for,book4up,Module 7,correct
+ss,2023-12-27 07:34:17,eleven,book4up,Module Number,correct
+ss,2023-12-27 07:34:20,twelve,book4up,Module Number,correct
+ss,2023-12-27 07:34:22,thirteen,book4up,Module Number,correct
+ss,2023-12-27 07:34:26,fourteen,book4up,Module Number,correct
+ss,2023-12-27 07:34:29,fifteen,book4up,Module Number,correct
+ss,2023-12-27 07:34:34,sixteen,book4up,Module Number,correct
