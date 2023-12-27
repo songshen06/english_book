@@ -234,6 +234,7 @@ def test_cn_to_en():
     
     return render_template('test_cn_to_en.html', word=words[session['current_word']])
 
+
 @app.route('/test_en_to_cn', methods=['GET', 'POST'])
 def test_en_to_cn():
     # Ensure the user is logged in
@@ -258,67 +259,63 @@ def test_en_to_cn():
     # Get the selected module's words
     words = dict(book_module.modules[session['selected_module']])  # Directly access the 'modules' dictionary from the imported book module
     #print(session)
-# Get a random word from the module
-  #  word_en, word_cn = random.choice(list(words.items()))
-    if 'word_index' not in session:
+    # 初始化随机索引列表
+    if 'random_indexes' not in session:
+        session['random_indexes'] = random.sample(range(len(words)), len(words))
         session['word_index'] = 0
-    word_keys = list(words.keys())
-    if session['word_index'] < len(word_keys):
-        word_en = word_keys[session['word_index']]
-        word_cn = words[word_en]
-        #print('现在测试的答案是', word_cn)
-        #print('english world', word_en)
-
   
+# 获取当前单词
+    current_index = session['random_indexes'][session['word_index']]
+    word_en, word_cn = list(words.items())[current_index]
+    print('现在测试的答案是', word_cn)
+    print('english world', word_en)
+    print('word_index',session['word_index'])  
 
 
-    # Remove the correct answer from words
-        del words[word_en]
-
-
-        if request.method == 'POST':
-            choices = session.get('previous_choices')
-            user_choice = request.form.get('word_choice')
-            #print('use choose abc is ',user_choice)
-            correct_answer = word_cn
+    if request.method == 'POST':
+        choices = session.get('previous_choices')
+        user_choice = request.form.get('word_choice')
+        print('use choose abc is ',user_choice)
+        correct_answer = word_cn
             #print('user choice is ',choices[user_choice])
-            if choices[user_choice] == correct_answer:
+        if choices[user_choice] == correct_answer:
                 # 记录正确答案
                 # 这里可以更新session或数据库来记录用户得分
-                flash('Correct!', 'success')
-                record_data(session['username'], word_en, session['selected_book'], session['selected_module'], True)
+            flash('Correct!', 'success')
+            record_data(session['username'], word_en, session['selected_book'], session['selected_module'], True)
                 #record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], True, "en_to_cn")
                 
-            else:
+        else:
                 # 记录错误答案
                 # 这里可以更新session或数据库来记录用户的错误
                 #wrong_answer = True 
-                flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
-                record_data(session['username'], word_en, session['selected_book'], session['selected_module'], False)
+            flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
+            record_data(session['username'], word_en, session['selected_book'], session['selected_module'], False)
                 #record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], False, "en_to_cn")
-                image_path = get_image_path(word_en)         
-                return render_template('test_en_to_cn.html', word_en=word_en, choices=choices, image_path=image_path)
-            session['word_index'] += 1
+            image_path = get_image_path(word_en)         
+            return render_template('test_en_to_cn.html', word_en=word_en, choices=choices, image_path=image_path)
+        session['word_index'] += 1
+        if session['word_index'] >= len(words):
+            # 所有单词完成
+            return redirect(url_for('learning_results'))
             #time.sleep == 1
-            return redirect(url_for('test_en_to_cn'))
-        else:
-                # Generate dummy choices
-            dummy_choices = random.sample(list(words.values()), 2)
-            dummy_choices.append(word_cn)
-            random.shuffle(dummy_choices)
-
-            choices = {
-                'a': dummy_choices[0],
-                'b': dummy_choices[1],
-                'c': dummy_choices[2]
-            }
-            #print(choices)
-            session['previous_choices'] = choices
-
+        return redirect(url_for('test_en_to_cn'))
+    
     else:
-        return redirect(url_for('learning_results'))
-      
+        # 生成不包含正确答案的假选项
+        values_without_correct = [value for value in words.values() if value != word_cn]
+        dummy_choices = random.sample(values_without_correct, 2)
+        dummy_choices.append(word_cn)
+        random.shuffle(dummy_choices)
 
+        choices = {
+            'a': dummy_choices[0],
+            'b': dummy_choices[1],
+            'c': dummy_choices[2]
+        }
+        session['previous_choices'] = choices
+    print(choices)
+    # 显示当前单词和选项
     return render_template('test_en_to_cn.html', word_en=word_en, choices=choices)
 
 @app.route('/test_cn_to_m_en', methods=['GET', 'POST'])
