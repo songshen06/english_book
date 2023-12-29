@@ -9,7 +9,7 @@ modules = {
         'love': '爱你的',
     },
     'Module 2': {
-        'skirt': '裙子',
+        'skirt': '短裙',
         'clean': '打扫，清理',
         'finish': '完成',
         'dirty': '脏的',

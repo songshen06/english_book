@@ -28,7 +28,8 @@
         <h2>Select a Module</h2>
         {% for module in modules %}
         <label>
-            <input type="radio" name="selected_module" value="{{ module }}" required>
+  <!--            <input type="radio" name="selected_module" value="{{ module }}" required> -->
+            <input type="checkbox" name="selected_modules" value="{{ module }}">
             {{ module }}
         </label>
         <br>
