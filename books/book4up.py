@@ -1,5 +1,17 @@
 # words.py
 modules = {
+    "Module Number": {
+    'eleven': 11,
+    'twelve': 12,
+    'thirteen': 13,
+    'fourteen': 14,
+    'fifteen': 15,
+    'sixteen': 16,
+    'seventeen': 17,
+    'eighteen': 18,
+    'nineteen': 19,
+    'twenty': 20
+},
     'Module 1': {
         'dear': '亲爱的',
         'well': '好，健康的',
@@ -119,18 +131,6 @@ modules = {
         "cut": "（cut 的过去时态）切, 割",
         "finger": "手指"
     },
-        "Module Number": {
-    'eleven': 11,
-    'twelve': 12,
-    'thirteen': 13,
-    'fourteen': 14,
-    'fifteen': 15,
-    'sixteen': 16,
-    'seventeen': 17,
-    'eighteen': 18,
-    'nineteen': 19,
-    'twenty': 20
-},
     "Module 10": {
         "early": "早",
         "every": "每个, 每一",
