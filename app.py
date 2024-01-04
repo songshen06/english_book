@@ -497,23 +497,37 @@ def retest_mode_en_to_cn():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    if 'selected_book' not in session or 'selected_module' not in session:
-        return redirect(url_for('select'))
+    words = {}
 
-    # 动态导入所选书的模块
-    book_module = importlib.import_module(f"books.{session['selected_book']}")
-
-    # 获取所选模块的单词
-    words = dict(book_module.modules[session['selected_module']])
+# 检查是否已选择了书籍和模块
+    if 'selected_book' in session and 'selected_modules' in session:
+        selected_book = session['selected_book']
+        selected_modules = session['selected_modules']
+        # 动态导入所选书籍的模块
+        book_module_path = f"books.{selected_book}"
+        try:
+            book_module = importlib.import_module(book_module_path)
+        # 遍历所有选中的模块并合并它们的单词
+            for module_name in selected_modules:
+                words.update(book_module.modules[module_name])
+            #print(words)
+        except ImportError as e:
+            # 可以在这里添加错误处理的逻辑，比如记录错误信息
+            print(f"Error importing module {module_name}: {e}")
 
     # 初始化 session 数据
     if 'incorrect_words' not in session :  # 检查incorrect_words是否存在
         session['incorrect_words'] = list(words.keys())  # 如果是，将其初始化为所有英文单词
+        session['retest_random_indexes'] = random.sample(range(len(session['incorrect_words'])), len(session['incorrect_words']))
         session['retest_results'] = []
         session['word_index'] = 0
 
-    word_en = session['incorrect_words'][session['word_index']]
+    current_index = session['retest_random_indexes'][session['word_index']]
+    #word_en = session['incorrect_words'][session['word_index']]
+    word_en = session['incorrect_words'][current_index]
     word_cn = words[word_en]
+
+
     #print(word_en)
     #print(word_cn)
     if request.method == 'POST':
@@ -528,7 +542,9 @@ def retest_mode_en_to_cn():
         #session['retest_results'].append(result_data)
 
         if choices[user_choice] == correct_answer:  # 如果选择正确，从incorrect_words列表中移除该单词
-            session['incorrect_words'].pop(session['word_index'])
+            #session['incorrect_words'].pop(session['word_index'])
+            session['incorrect_words'].pop(current_index)
+            session['retest_random_indexes'] = random.sample(range(len(session['incorrect_words'])), len(session['incorrect_words']))
     # 更新或重置 word_index
             if session['incorrect_words']:  # 如果列表中还有单词
                 session['word_index'] = session['word_index'] % len(session['incorrect_words'])  # 更新 word_index
@@ -539,7 +555,8 @@ def retest_mode_en_to_cn():
                 return redirect(url_for('retest_results'))
                 
         else:
-            session['word_index'] = (session['word_index'] + 1) % len(session['incorrect_words'])  # 如果选择错误，移到下一个单词
+            #session['word_index'] = (session['word_index'] + 1) % len(session['incorrect_words'])  # 如果选择错误，移到下一个单词
+            session['word_index'] = (session['word_index'] + 1) % len(session['retest_random_indexes'])
 
         return redirect(url_for('retest_mode_en_to_cn'))
     else:
@@ -567,17 +584,20 @@ def retest_mode_en_to_cn():
 
 @app.route('/retest_results')
 def retest_results():
-    selected_book = session.get('selected_book', 'Unknown Book')
-    selected_module = session.get('selected_module', 'Unknown Module')
-    record_result(session['username'], session['selected_book'], session['selected_module'],'200' )
-    return render_template('retest_results.html', selected_book=selected_book, selected_module=selected_module)
+    #selected_book = session.get('selected_book', 'Unknown Book')
+    #selected_module = session.get('selected_module', 'Unknown Module')
+    selected_book = session.get('selected_book')
+    selected_modules = session.get('selected_modules')
+
+    #record_result(session['username'], session['selected_book'], session['selected_modules'],'200' )
+    return render_template('retest_results.html', selected_book=selected_book, selected_modules=selected_modules)
 
 @app.route('/learning_results')
 def learning_results():
     selected_book = session.get('selected_book', 'Unknown Book')
     selected_module = session.get('selected_module', 'Unknown Module')
     session.clear()
-    return render_template('learning_results.html', selected_book=selected_book, selected_module=selected_module)
+    return render_template('learning_results.html', selected_book=selected_book, selected_module=selected_modules)
 
 
 def get_test_report(username, selected_book, selected_module):
