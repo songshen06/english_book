@@ -1083,3 +1083,6 @@ ss,2023-12-31 08:44:36,bump,book4up,"['Module Number', 'Module 7', 'Module 8', '
 6666,2024-01-02 20:42:02,eighty,book4up,"['Module Number', 'Module 5', 'Module 6']",correct
 6666,2024-01-02 20:42:06,painting,book4up,"['Module Number', 'Module 5', 'Module 6']",correct
 6666,2024-01-02 20:42:08,had,book4up,"['Module Number', 'Module 5', 'Module 6']",correct
+ss,2024-01-04 13:34:20,dear,book4up,['Module 1'],fault
+ss,2024-01-04 20:53:47,dear,book4up_sentence,['Module 1'],fault
+ss,2024-01-04 20:55:27,love,book4up_sentence,['Module 1'],fault

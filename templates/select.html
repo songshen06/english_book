@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Book, Module, and Test Type</title>
+    <script>
+        function updateTestTypeOptions() {
+            var selectedBook = document.querySelector('input[name="selected_book"]:checked')?.value;
+            var testTypeOptions = document.querySelectorAll('.testTypeOption');
+            var specialTestTypeOption = document.getElementById('specialTestTypeOption');
+
+            testTypeOptions.forEach(function(option) {
+                option.style.display = 'none';
+            });
+
+            if (selectedBook && selectedBook.includes('_sentence')) {
+                specialTestTypeOption.style.display = 'block';
+            } else {
+                testTypeOptions.forEach(function(option) {
+                    if (option.id !== 'specialTestTypeOption') {
+                        option.style.display = 'block';
+                    }
+                });
+            }
+        }
+
+        // 在页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTestTypeOptions();
+        });
+    </script>
+
 </head>
 <body>
     <h1>Selection</h1>
@@ -14,14 +41,15 @@
         {% for book in books %}
         <label>
             <input type="radio" name="selected_book" value="{{ book }}" required 
-                   {% if session['selected_book'] == book %} checked {% endif %}> 
+                   {% if session['selected_book'] == book %} checked {% endif %}
+                   onchange="updateTestTypeOptions()"> 
             {{ book }}
         </label>
         <br>
         {% endfor %}
         <input type="submit" value="Load Modules">
     </form>
-    <br>
+
 
     <!-- Module and Test Type Selection -->
     <form action="{{ url_for('select') }}" method="post">
@@ -37,28 +65,33 @@
         <br>
 
         <h2>Select Test Type</h2>
-        <label>
-            <input type="radio" name="test_type" value="cn_to_en" required> 看中文，写英文
+        <!-- 常规测试类型选项 -->
+        <label class="testTypeOption">
+            <input type="radio" name="test_type" value="cn_to_en"> 看中文，写英文
         </label>
-        <br>
-        <label>
+        <br><br>
+        <label class="testTypeOption">
             <input type="radio" name="test_type" value="en_to_cn"> 看英文，选择中文
         </label>
-        <br>
-        <label>
+        <br><br>
+        <label class="testTypeOption">
             <input type="radio" name="test_type" value="cn_to_m_en"> 看中文，选择英文
         </label>
-        <br>
         <br><br>
-        <label>
+        <label class="testTypeOption">
             <input type="radio" name="test_type" value="test_mode_en_to_cn"> 看英文，选择中文(考试模式)
         </label>
         <br><br>
-        <br>
-        <label>
+        <label class="testTypeOption">
             <input type="radio" name="test_type" value="retest_mode_en_to_cn"> 看英文，选择中文（不做完不结束）
         </label>
-        <br>
+        <br><br>
+
+        <!-- 特定测试类型选项 -->
+        <label class="testTypeOption" id="specialTestTypeOption" style="display: none;">
+            <input type="radio" name="test_type" value="read_en_to_cn"> 看英文，选择中文(有例句)
+        </label>
+        <br><br>
         <input type="submit" value="Start Test">
     </form>
 

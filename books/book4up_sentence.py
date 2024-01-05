@@ -15,7 +15,7 @@ modules = {
             }
         },
         'of': {
-            'translation': '的',
+            'translation': '什么什么的',
             'sentences': {
                 'example_en': 'The color of the sky is blue.',
                 'example_cn': '天空的颜色是蓝色的。'
@@ -79,7 +79,7 @@ modules = {
                 'example_cn': '孩子们喜欢画画。'
             }
         },
-        'Mr': {
+        'Mr.': {
             'translation': '先生',
             'sentences': {
                 'example_en': 'Mr. Smith is my teacher.',

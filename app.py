@@ -68,14 +68,16 @@ def select():
                 print(session)
                 if selected_test_type == "cn_to_en":
                     return redirect(url_for('test_cn_to_en'))
-                elif selected_test_type == "en_to_cn":
+                elif selected_test_type == "en_to_cn": #看英文选中文
                     return redirect(url_for('test_en_to_cn'))
-                elif selected_test_type == "cn_to_m_en":  # 这是新增的逻辑
+                elif selected_test_type == "cn_to_m_en":  # 看中文，选英文
                     return redirect(url_for('test_cn_to_m_en'))
-                elif selected_test_type == "test_mode_en_to_cn": # new test mode
+                elif selected_test_type == "test_mode_en_to_cn": # 考试模式
                     return redirect(url_for('test_mode_en_to_cn'))
-                elif selected_test_type == "retest_mode_en_to_cn": # new test mode
+                elif selected_test_type == "retest_mode_en_to_cn": # 无尽模式
                     return redirect(url_for('retest_mode_en_to_cn'))
+                elif selected_test_type == "read_en_to_cn": #例句模式
+                    return redirect(url_for('read_en_to_cn'))
     # If a book is already selected, get its modules
     elif 'selected_book' in session and session['selected_book'] in BOOKS_MODULES:
         modules = BOOKS_MODULES[session['selected_book']]
@@ -83,79 +85,6 @@ def select():
     return render_template('select.html', books=available_books, modules=modules.keys())
 
 
-'''
-BOOKS_DIR = "books"
-BOOKS_MODULES = {}
-
-# Dynamically import all books and their modules
-for book_file in glob.glob(f"{BOOKS_DIR}/book*.py"):
-    book_name = os.path.splitext(os.path.basename(book_file))[0]
-    book_module = __import__(f"{BOOKS_DIR}.{book_name}", fromlist=[''])
-    BOOKS_MODULES[book_name] = book_module.modules
-
-
-
-@app.route('/select_book', methods=['GET', 'POST'])
-def select_book():
-    # 获取 books 目录下所有的 .py 文件
-    book_files = [f for f in os.listdir('books') if f.endswith('.py')]
-    
-    # 从文件名中提取书的名字，例如从"book1.py"中提取"book1"
-    available_books = [os.path.splitext(f)[0] for f in book_files]
-
-    # 如果用户已经选择了一个书籍，将选择存储到 session 中，并重定向到选择模块的页面
-    if request.method == 'POST':
-        selected_book = request.form.get('selected_book')
-        if selected_book in available_books:
-            session['selected_book'] = selected_book
-            return redirect(url_for('select_module'))
-    
-    return render_template('select_book.html', books=available_books)
-
-
-
-
-@app.route('/select_module', methods=['GET', 'POST'])
-def select_module():
-    print(session)
-    # Ensure the user is logged in
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    # Check if the book is selected
-    if 'selected_book' not in session:
-        print("enterin return select book\n")
-        return redirect(url_for('select_book'))
-
-    # Dynamically import the selected book's module
-    book_module = importlib.import_module(f"books.{session['selected_book']}")
-    modules = book_module.modules  # Access the 'modules' dictionary from the imported book module
-
-    # Handle the form submission
-    if request.method == 'POST':
-        selected_module = request.form.get('selected_module')
-        if selected_module in modules:
-            session['selected_module'] = selected_module
-            #return redirect(url_for('test', module_name=selected_module))
-            return redirect(url_for('select_test_type'))  # 重定向到测试类型选择页面
-
-    return render_template('select_module.html', modules=modules.keys())
-
-@app.route('/select_test_type', methods=['GET', 'POST'])
-def select_test_type():
-    if 'selected_module' not in session:
-        return redirect(url_for('index'))
-
-    if request.method == 'POST':
-        selected_test_type = request.form.get('test_type')
-        if selected_test_type == "cn_to_en":
-            return redirect(url_for('test_cn_to_en'))
-        elif selected_test_type == "en_to_cn":
-            return redirect(url_for('test_en_to_cn'))
-
-    return render_template('select_test_type.html')
-
-'''
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -185,10 +114,49 @@ def play_video(filename):
     return render_template('play_video.html', video_file=url_for('static', filename=f'videos/{filename}'))
 
 
+#optimized 
+def load_words(selected_book, selected_modules):
+    """
+    Load and combine words from selected book and modules.
+    """
+    words = {}
+    book_module_path = f"books.{selected_book}"
+    try:
+        book_module = importlib.import_module(book_module_path)
+        for module_name in selected_modules:
+            words.update(book_module.modules[module_name])
+    except ImportError as e:
+        print(f"Error importing module {module_name}: {e}")
+    return words
 
+def generate_random_indexes(words):
+    """
+    Generate a list of random indexes for the words.
+    """
+    return random.sample(range(len(words)), len(words))
 
-#@app.route('/test', methods=['GET', 'POST'])
-#def test():
+def generate_dummy_choices(correct_answer, all_answers, num_dummies=3):
+    """
+    Generate dummy choices for a quiz question.
+    """
+    dummy_choices = random.sample([word for word in all_answers if word != correct_answer], num_dummies)
+    dummy_choices.append(correct_answer)
+    random.shuffle(dummy_choices)
+    return dummy_choices
+
+def generate_dummy_choices_new(correct_answer, all_answers, num_dummies=3):
+    """
+    Generate dummy choices for a quiz question.
+    Given the new dictionary structure, where each word has a dictionary
+    containing its translation and example sentences, this function will
+    pick dummy choices based on the 'translation' field.
+    """
+    # 提取所有的翻译，并从中选择不是正确答案的翻译
+    dummy_choices = random.sample([word_info['translation'] for word, word_info in all_answers.items() if word_info['translation'] != correct_answer], num_dummies)
+    dummy_choices.append(correct_answer)
+    random.shuffle(dummy_choices)
+    return dummy_choices
+
 @app.route('/test_cn_to_en', methods=['GET', 'POST'])
 def test_cn_to_en():
     # Ensure the user is logged in
@@ -238,40 +206,101 @@ def test_cn_to_en():
     return render_template('test_cn_to_en.html', word=words[session['current_word']])
 
 
+
+@app.route('/read_en_to_cn', methods=['GET', 'POST'])
+def read_en_to_cn():
+    # Ensure the user is logged in
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    correct_answer_chosen = False
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
+    if 'random_indexes' not in session:
+        session['random_indexes'] = generate_random_indexes(words)  
+        session['word_index'] = 0
+    current_index = session['random_indexes'][session['word_index']]
+    word_en, word_info = list(words.items())[current_index]
+    word_cn = word_info['translation']
+    example_en = word_info['sentences']['example_en']
+    example_cn = word_info['sentences']['example_cn']
+
+
+    if request.method == 'POST':
+        if 'next_word' in request.form:
+            # 处理“下一个单词”的逻辑
+            session['word_index'] += 1
+            if session['word_index'] >= len(words):
+                # 所有单词完成
+                return redirect(url_for('learning_results'))
+            return redirect(url_for('read_en_to_cn'))
+        elif 'word_choice' in request.form:            
+            choices = session.get('previous_choices')
+            user_choice = request.form.get('word_choice')
+            #print('use choose abc is ',user_choice)
+            correct_answer = word_cn
+                #print('user choice is ',choices[user_choice])
+            if choices[user_choice] == correct_answer:
+                correct_answer_chosen = True
+                    # 记录正确答案
+                    # 这里可以更新session或数据库来记录用户得分
+                flash('Correct!', 'success')
+                #flash(f'Example: {example_en} - {example_cn}', 'info')
+                return render_template('read_en_to_cn.html', word_en=word_en, choices=choices, example_en=example_en, example_cn=example_cn, correct_answer_chosen=correct_answer_chosen)
+                #record_data(session['username'], word_en, session['selected_book'], session['selected_modules'], True)
+                    #record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], True, "en_to_cn")
+                    
+            else:
+                    # 记录错误答案
+                    # 这里可以更新session或数据库来记录用户的错误
+                    #wrong_answer = True 
+                flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
+                #record_data(session['username'], word_en, session['selected_book'], session['selected_modules'], False)
+                    #record_to_db(session['username'], word_en, session['selected_book'], session['selected_module'], False, "en_to_cn")
+                image_path = get_image_path(word_en)         
+                return render_template('read_en_to_cn.html', word_en=word_en, choices=choices, image_path=image_path)
+        #session['word_index'] += 1
+        #if 'next_word' in request.form:
+         #   session['word_index'] += 1
+          #  if session['word_index'] >= len(words):
+                # 所有单词完成
+           #     return redirect(url_for('learning_results'))
+                #time.sleep == 1
+            #return redirect(url_for('read_en_to_cn'))
+
+    else:
+        # 生成不包含正确答案的假选项
+        correct_answer = word_cn
+        #dummy_choices = generate_dummy_choices(correct_answer, words.values())
+        dummy_choices = generate_dummy_choices_new(correct_answer, words)
+        choices = {
+            'a': dummy_choices[0],
+            'b': dummy_choices[1],
+            'c': dummy_choices[2]
+        }
+        session['previous_choices'] = choices
+        # 在最后返回修改后的模板
+        #return render_template('read_en_to_cn.html',word_en=word_en, choices=choices, example_en=example_en, example_cn=example_cn)
+        return render_template('read_en_to_cn.html', word_en=word_en, choices=choices, example_en=example_en, example_cn=example_cn, correct_answer_chosen=correct_answer_chosen)
+
+# 确保其他代码引用此函数时使用新的函数名 read_en_to_cn
+
+
 @app.route('/test_en_to_cn', methods=['GET', 'POST'])
 def test_en_to_cn():
     # Ensure the user is logged in
     if 'username' not in session:
         return redirect(url_for('login'))
-
-    words = {}
-
-# 检查是否已选择了书籍和模块
     if 'selected_book' in session and 'selected_modules' in session:
-        selected_book = session['selected_book']
-        selected_modules = session['selected_modules']
-        # 动态导入所选书籍的模块
-        book_module_path = f"books.{selected_book}"
-        try:
-            book_module = importlib.import_module(book_module_path)
-        # 遍历所有选中的模块并合并它们的单词
-            for module_name in selected_modules:
-                words.update(book_module.modules[module_name])
-            #print(words)
-        except ImportError as e:
-            # 可以在这里添加错误处理的逻辑，比如记录错误信息
-            print(f"Error importing module {module_name}: {e}")
-# 初始化随机索引列表
+        words = load_words(session['selected_book'], session['selected_modules'])
     if 'random_indexes' not in session:
-        session['random_indexes'] = random.sample(range(len(words)), len(words))
+        session['random_indexes'] = generate_random_indexes(words)  
         session['word_index'] = 0
-  
-# 获取当前单词
+    # 获取当前单词
     current_index = session['random_indexes'][session['word_index']]
     word_en, word_cn = list(words.items())[current_index]
     #print('现在测试的答案是', word_cn)
     #print('english world', word_en)
-    print(current_index)  
+   # print(current_index)  
 
 
     if request.method == 'POST':
@@ -305,11 +334,8 @@ def test_en_to_cn():
     
     else:
         # 生成不包含正确答案的假选项
-        values_without_correct = [value for value in words.values() if value != word_cn]
-        dummy_choices = random.sample(values_without_correct, 2)
-        dummy_choices.append(word_cn)
-        random.shuffle(dummy_choices)
-
+        correct_answer = word_cn
+        dummy_choices = generate_dummy_choices(correct_answer, words.values())
         choices = {
             'a': dummy_choices[0],
             'b': dummy_choices[1],
@@ -320,20 +346,17 @@ def test_en_to_cn():
     # 显示当前单词和选项
     return render_template('test_en_to_cn.html', word_en=word_en, choices=choices)
 
+
+
+
 @app.route('/test_cn_to_m_en', methods=['GET', 'POST'])
 def test_cn_to_m_en():
     # Ensure the user is logged in
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    if 'selected_book' not in session or 'selected_module' not in session:
-        return redirect(url_for('select'))
-
-    # Dynamically import the selected book's module
-    book_module = importlib.import_module(f"books.{session['selected_book']}")
-
-    # Get the selected module's words
-    words = dict(book_module.modules[session['selected_module']])
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
 
     if 'word_index' not in session:
         session['word_index'] = 0
@@ -383,29 +406,22 @@ def test_cn_to_m_en():
 
     return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
 
-@app.route('/test_mode_en_to_cn', methods=['GET', 'POST'])
+@app.route('/test_mode_en_to_cn', methods=['GET', 'POST'])   #考试模式
 def test_mode_en_to_cn():
     # Ensure the user is logged in
     if 'username' not in session:
         return redirect(url_for('login'))
-
-    words = {}
-
-# 检查是否已选择了书籍和模块
     if 'selected_book' in session and 'selected_modules' in session:
-        selected_book = session['selected_book']
-        selected_modules = session['selected_modules']
-        # 动态导入所选书籍的模块
-        book_module_path = f"books.{selected_book}"
-        try:
-            book_module = importlib.import_module(book_module_path)
-        # 遍历所有选中的模块并合并它们的单词
-            for module_name in selected_modules:
-                words.update(book_module.modules[module_name])
-            #print(words)
-        except ImportError as e:
-            # 可以在这里添加错误处理的逻辑，比如记录错误信息
-            print(f"Error importing module {module_name}: {e}")
+        words = load_words(session['selected_book'], session['selected_modules'])
+    if 'random_indexes' not in session:
+        session['random_indexes'] = generate_random_indexes(words)  
+        session['word_index'] = 0
+    # 获取当前单词
+    current_index = session['random_indexes'][session['word_index']]
+    word_en, word_cn = list(words.items())[current_index]
+    #print('现在测试的答案是', word_cn)
+    #print('english world', word_en)
+    print(current_index)  
 
     if 'random_indexes' not in session:
         session['random_indexes'] = random.sample(range(len(words)), len(words))
@@ -477,43 +493,26 @@ def test_mode_en_to_cn():
         else:
             #dummy_choices = random.sample(list(words.values()), 2)
             # 生成不包含正确答案的假选项
-            values_without_correct = [value for value in words.values() if value != word_cn]
-            dummy_choices = random.sample(values_without_correct, 2)
-            dummy_choices.append(word_cn)
-            random.shuffle(dummy_choices)
-
+            correct_answer = word_cn
+            dummy_choices = generate_dummy_choices(correct_answer, words.values())
             choices = {
                 'a': dummy_choices[0],
                 'b': dummy_choices[1],
-                'c': dummy_choices[2]
+                'c': dummy_choices[2],
+                'd': dummy_choices[3]
             }
 
             session['previous_choices'] = choices
     return render_template('test_mode_en_to_cn.html', word_en=word_en, choices=choices)
 
-@app.route('/retest_mode_en_to_cn', methods=['GET', 'POST'])
+@app.route('/retest_mode_en_to_cn', methods=['GET', 'POST']) #不做完不结束
 def retest_mode_en_to_cn():
     # 保证用户已登录
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    words = {}
-
-# 检查是否已选择了书籍和模块
     if 'selected_book' in session and 'selected_modules' in session:
-        selected_book = session['selected_book']
-        selected_modules = session['selected_modules']
-        # 动态导入所选书籍的模块
-        book_module_path = f"books.{selected_book}"
-        try:
-            book_module = importlib.import_module(book_module_path)
-        # 遍历所有选中的模块并合并它们的单词
-            for module_name in selected_modules:
-                words.update(book_module.modules[module_name])
-            #print(words)
-        except ImportError as e:
-            # 可以在这里添加错误处理的逻辑，比如记录错误信息
-            print(f"Error importing module {module_name}: {e}")
+        words = load_words(session['selected_book'], session['selected_modules'])
 
     # 初始化 session 数据
     if 'incorrect_words' not in session :  # 检查incorrect_words是否存在
@@ -595,9 +594,9 @@ def retest_results():
 @app.route('/learning_results')
 def learning_results():
     selected_book = session.get('selected_book', 'Unknown Book')
-    selected_module = session.get('selected_module', 'Unknown Module')
+    selected_module = session.get('selected_modules', 'Unknown Module')
     session.clear()
-    return render_template('learning_results.html', selected_book=selected_book, selected_module=selected_modules)
+    return render_template('learning_results.html', selected_book=selected_book, selected_module=selected_module)
 
 
 def get_test_report(username, selected_book, selected_module):

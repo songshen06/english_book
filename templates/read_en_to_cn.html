@@ -1,0 +1,75 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if not correct_answer_chosen %}
+    <form id="wordChoiceForm" method="post">
+        <h2>Translate the following word:</h2>
+        <p>{{ word_en }}</p>
+        <button type="button" onclick="speakWord('{{ word_en }}')">朗读单词</button>
+        <br><br>
+        <label>
+            <input type="radio" name="word_choice" value="a">{{ choices.a }}
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="word_choice" value="b">{{ choices.b }}
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="word_choice" value="c">{{ choices.c }}
+        </label>
+        <br>
+        <button type="button" onclick="validateAndSubmit()">Submit</button>
+    </form>
+{% endif %}
+
+{% if image_path %}
+    <img src="{{ image_path }}" alt="Hint for {{ word_en }}">
+{% endif %}
+
+{% if correct_answer_chosen %}
+    <!-- 显示例句和阅读按钮 -->
+    <p style="font-size: larger;">例句: {{ example_en }}</p>
+    <p style="font-size: larger;">例句翻译: {{ example_cn }}</p>
+    <button type="button" onclick="speak('{{ example_en | safe }}')" style="margin-bottom: 10px;">朗读英文例句</button>
+    <!-- 添加“下一个单词”按钮 -->
+    <form method="post" style="margin-top: 10px;">
+        <button type="submit" name="next_word">Next Word</button>
+    </form>
+{% endif %}
+
+
+<script>
+    function speakWord(word) {
+        var synth = window.speechSynthesis;
+        var utterThis = new SpeechSynthesisUtterance(word);
+        synth.speak(utterThis);
+    }
+    function speak(text) {
+        var msg = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(msg);
+    }
+    function validateAndSubmit() {
+        var radios = document.getElementsByName('word_choice');
+        var formIsValid = false;
+
+        // Check if any radio button is selected
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                formIsValid = true;
+                break;
+            }
+        }
+
+        if (formIsValid) {
+            document.getElementById('wordChoiceForm').submit();
+        } else {
+            alert('Please select an option before submitting!');
+        }
+    }
+</script>
