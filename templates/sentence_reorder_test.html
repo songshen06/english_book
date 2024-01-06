@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sentence Reordering Test</title>
+    <style>
+        .large-input {
+            width: 100%;     /* Full width */
+            height: 50px;    /* 50 pixels high */
+            font-size: 20px; /* Larger font size */
+            padding: 5px;    /* Padding inside the input */
+        }
+            /* 新添加的 CSS 样式 */
+        .sentence-container {
+            border: 1px solid #ccc;
+            padding: 10px; /* 更大的内边距 */
+            min-height: 80px; /* 更大的最小高度 */
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 20px; /* 更大的字体大小 */
+        }
+        .word-span {
+            margin-right: 5px;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: inline-block;
+            font-size: 20px; /* 单词的字体大小 */
+        }
+        .remove-btn {
+            margin-left: 5px;
+            color: red;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 10px; /* 删除按钮的字体大小 */
+            padding: 1px; /* 删除按钮的内边距 */
+            line-height: 1; /* 调整行高以更好地对齐 */
+            vertical-align: top; /* 垂直对齐 */
+        }
+    </style>    
+</head>
+<body>
+    <h1>按照给出的中文，写出正确的英文句子</h1>
+    <p>Translate this sentence: {{ example_cn }}</p>
+    <form action="{{ url_for('sentence_reorder_test') }}" method="post" onsubmit="prepareSubmission()">
+        {% for word in jumbled_words %}
+            <button type="button" onclick="addToSentence('{{ word }}')">{{ word }}</button>
+        {% endfor %}
+        <br>
+        <div id="sentence_div" class="sentence-container"></div>
+        <input type="button" value="Read Sentence" onclick="readAllWords()">
+        <input type="submit" value="Submit Answer">
+    </form>
+    <script>
+        function addToSentence(word) {
+            var inputDiv = document.getElementById('sentence_div');
+            var wordSpan = document.createElement('span');
+            var removeBtn = document.createElement('button');
+
+            wordSpan.textContent = word;
+            wordSpan.classList.add('word-span');
+
+            removeBtn.textContent = 'X';
+            removeBtn.classList.add('remove-btn');
+            removeBtn.onclick = function() { inputDiv.removeChild(wordSpan); };
+
+            wordSpan.appendChild(removeBtn);
+            inputDiv.appendChild(wordSpan);
+
+            speakWord(word);
+        }
+
+    function speakWord(word) {
+        var msg = new SpeechSynthesisUtterance(word);
+        window.speechSynthesis.speak(msg);
+        }
+        function readAllWords() {
+        var sentence = Array.from(document.querySelectorAll('#sentence_div .word-span'))
+                        .map(span => span.textContent.replace('X', '').trim())
+                        .join(' ');
+        speakWord(sentence);
+        }
+
+        function prepareSubmission() {
+            var sentence = Array.from(document.querySelectorAll('#sentence_div .word-span'))
+                                .map(span => span.textContent.replace('X', '').trim())
+                                .join(' ');
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'reordered_sentence';
+            hiddenInput.value = sentence;
+            document.querySelector('form').appendChild(hiddenInput);
+        }
+
+    </script>
+</body>
+</html>

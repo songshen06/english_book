@@ -8,22 +8,25 @@
         function updateTestTypeOptions() {
             var selectedBook = document.querySelector('input[name="selected_book"]:checked')?.value;
             var testTypeOptions = document.querySelectorAll('.testTypeOption');
-            var specialTestTypeOption = document.getElementById('specialTestTypeOption');
+            var specialTestTypeOption1 = document.getElementById('specialTestTypeOption1');
+            var specialTestTypeOption2 = document.getElementById('specialTestTypeOption2');
 
             testTypeOptions.forEach(function(option) {
                 option.style.display = 'none';
             });
 
             if (selectedBook && selectedBook.includes('_sentence')) {
-                specialTestTypeOption.style.display = 'block';
+                specialTestTypeOption1.style.display = 'block';
+                specialTestTypeOption2.style.display = 'block';
             } else {
                 testTypeOptions.forEach(function(option) {
-                    if (option.id !== 'specialTestTypeOption') {
+                    if (!option.id.startsWith('specialTestTypeOption')) {
                         option.style.display = 'block';
                     }
                 });
             }
         }
+
 
         // 在页面加载时执行
         document.addEventListener('DOMContentLoaded', function() {
@@ -88,8 +91,12 @@
         <br><br>
 
         <!-- 特定测试类型选项 -->
-        <label class="testTypeOption" id="specialTestTypeOption" style="display: none;">
+        <label class="testTypeOption" id="specialTestTypeOption1" style="display: none;">
             <input type="radio" name="test_type" value="read_en_to_cn"> 看英文，选择中文(有例句)
+        </label>
+        <br><br>
+        <label class="testTypeOption" id="specialTestTypeOption2" style="display: none;">
+            <input type="radio" name="test_type" value="sentence_reorder_test"> 语句排序
         </label>
         <br><br>
         <input type="submit" value="Start Test">

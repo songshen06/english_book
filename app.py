@@ -78,6 +78,9 @@ def select():
                     return redirect(url_for('retest_mode_en_to_cn'))
                 elif selected_test_type == "read_en_to_cn": #例句模式
                     return redirect(url_for('read_en_to_cn'))
+                elif selected_test_type == "sentence_reorder_test": #例句模式
+                    return redirect(url_for('sentence_reorder_test'))
+                    
     # If a book is already selected, get its modules
     elif 'selected_book' in session and session['selected_book'] in BOOKS_MODULES:
         modules = BOOKS_MODULES[session['selected_book']]
@@ -205,7 +208,42 @@ def test_cn_to_en():
     
     return render_template('test_cn_to_en.html', word=words[session['current_word']])
 
+@app.route('/sentence_reorder_test', methods=['GET', 'POST'])
+def sentence_reorder_test():
+    # Ensure the user is logged in
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    #correct_answer_chosen = False
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
+    if 'random_indexes' not in session:
+        session['random_indexes'] = generate_random_indexes(words)  
+        session['word_index'] = 0
+    current_index = session['random_indexes'][session['word_index']]
+    word_en, word_info = list(words.items())[current_index]
+    word_cn = word_info['translation']
+    example_en = word_info['sentences']['example_en']
+    example_cn = word_info['sentences']['example_cn']
+# 打乱英文句子的单词顺序
+    example_en_words = example_en.split()
+    random.shuffle(example_en_words)
 
+    if request.method == 'POST':
+        user_input = request.form.get('reordered_sentence')
+        #print(user_input)
+        if user_input.strip() == example_en.strip():
+            # 如果答案正确，移动到下一个单词
+            session['word_index'] += 1
+            if session['word_index'] >= len(session['random_indexes']):
+                # 测试结束
+                return redirect(url_for('learning_results'))
+            else:
+                return redirect(url_for('sentence_reorder_test'))
+        else:
+            # 答案错误，重新加载页面
+            flash('Incorrect order, please try again.')
+
+    return render_template('sentence_reorder_test.html', example_cn=example_cn, jumbled_words=example_en_words)
 
 @app.route('/read_en_to_cn', methods=['GET', 'POST'])
 def read_en_to_cn():
