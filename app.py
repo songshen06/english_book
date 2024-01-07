@@ -7,7 +7,7 @@ import glob
 import importlib
 import random
 import csv
-
+from itertools import chain
 from database import db, init_db
 
 
@@ -71,7 +71,7 @@ def select():
                 elif selected_test_type == "en_to_cn": #看英文选中文
                     return redirect(url_for('test_en_to_cn'))
                 elif selected_test_type == "cn_to_m_en":  # 看中文，选英文
-                    return redirect(url_for('test_cn_to_m_en'))
+                    return redirect(url_for('exam_mode'))
                 elif selected_test_type == "test_mode_en_to_cn": # 考试模式
                     return redirect(url_for('test_mode_en_to_cn'))
                 elif selected_test_type == "retest_mode_en_to_cn": # 无尽模式
@@ -208,6 +208,53 @@ def test_cn_to_en():
     
     return render_template('test_cn_to_en.html', word=words[session['current_word']])
 
+@app.route('/exam_mode', methods=['GET'])
+def exam_mode():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'selected_book' in session and 'selected_modules' in session:
+        words_dict = load_words(session['selected_book'], session['selected_modules'])
+        
+        # 将字典转换为列表，并随机打乱
+        all_words = list(words_dict.items())
+        random.shuffle(all_words)
+
+        # 分组（每组6个单词）
+        groups = [all_words[i:i + 6] for i in range(0, len(all_words), 6)]
+
+        session['current_group_index'] = 0
+        session['word_groups'] = groups
+
+    return redirect(url_for('exam_mode_page'))
+
+@app.route('/exam_mode_page', methods=['GET', 'POST'])
+def exam_mode_page():
+    if request.method == 'POST':
+        finish_group = request.form.get('finish_group')
+        print("Received finish_group value:", finish_group)
+        
+        if finish_group == 'True':
+            group_index = session.get('current_group_index', 0) + 1
+            session['current_group_index'] = group_index
+
+            if group_index >= len(session.get('word_groups', [[]])):
+                # 所有组完成，结束测试
+                return redirect(url_for('learning_results'))
+
+            return redirect(url_for('exam_mode_page'))  # 重定向以加载新组
+
+    group_index = session.get('current_group_index', 0)
+    word_group = session.get('word_groups', [[]])[group_index]
+
+    translations = [translation for _, translation in word_group]
+    random.shuffle(translations)  # 打乱翻译
+    return render_template('exam_mode_page.html', word_group=word_group,translations=translations)
+
+
+
+
+
 @app.route('/sentence_reorder_test', methods=['GET', 'POST'])
 def sentence_reorder_test():
     # Ensure the user is logged in
@@ -216,6 +263,7 @@ def sentence_reorder_test():
     #correct_answer_chosen = False
     if 'selected_book' in session and 'selected_modules' in session:
         words = load_words(session['selected_book'], session['selected_modules'])
+        total_sentences = len(words)  # 获取总句子数量
     if 'random_indexes' not in session:
         session['random_indexes'] = generate_random_indexes(words)  
         session['word_index'] = 0
@@ -243,7 +291,8 @@ def sentence_reorder_test():
             # 答案错误，重新加载页面
             flash('Incorrect order, please try again.')
 
-    return render_template('sentence_reorder_test.html', example_cn=example_cn, jumbled_words=example_en_words)
+    return render_template('sentence_reorder_test.html', example_cn=example_cn, jumbled_words=example_en_words,total_sentences=total_sentences,
+                           remaining_sentences=len(session['random_indexes']) - session['word_index'])
 
 @app.route('/read_en_to_cn', methods=['GET', 'POST'])
 def read_en_to_cn():
@@ -413,11 +462,11 @@ def test_cn_to_m_en():
             correct_answer = word_en
             if choices[user_choice] == correct_answer:
                 flash('Correct!', 'success')
-                record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], True)
+                #record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], True)
                 #record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], True, "cn_to_m_en")
             else:
                 flash(f'Wrong! The correct answer is: {correct_answer}', 'danger')
-                record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], False)
+                #record_data(session['username'], word_cn, session['selected_book'], session['selected_module'], False)
                 #record_to_db(session['username'], word_cn, session['selected_book'], session['selected_module'], False, "cn_to_m_en")
                 return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
             session['word_index'] += 1

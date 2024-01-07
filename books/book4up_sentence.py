@@ -95,10 +95,10 @@ modules = {
         }
     },
         'Module 3': {
-        "didn't": {
+        "did not": {
             'translation': '不',
             'sentences': {
-                'example_en': "He didn't go to school yesterday because he was sick.",
+                'example_en': "He did not go to school yesterday because he was sick.",
                 'example_cn': '他昨天因为生病没有去上学。'
             }
         },
@@ -519,14 +519,14 @@ modules = {
         "doll": {
             'translation': "玩偶, 娃娃模特",
             'sentences': {
-                'example_en': 'My little sister has a doll that she always carries with her.',
-                'example_cn': '我妹妹有一个玩偶，她总是带着它。'
+                'example_en': 'My sister has a doll.',
+                'example_cn': '我妹妹有一个玩偶。'
             }
         },
         "matter": {
             'translation': "事情",
             'sentences': {
-                'example_en': "What's the matter? You look upset.",
+                'example_en': "What is the matter? You look upset.",
                 'example_cn': '怎么了？你看起来很不高兴。'
             }
         },

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam Mode</title>
+    <!-- 自定义弹窗 -->
+<div id="customAlert" style="display: none; position: fixed; top: 15%; left: 30%; transform: translate(-50%, -50%); z-index: 1000; background-color: white; padding: 20px; border: 1px solid black;">
+    <img id="alertImage" src="{{ url_for('static', filename='pics/icon/error.png') }}" alt="Error" style="max-width: 100%; height: auto;">
+    <p id="alertMessage"></p>
+    
+    <button onclick="closeCustomAlert()">Close</button>
+</div>
+
+
+
+<!-- 页面的其他内容 -->
+
+    <style>
+        .word-button, .translation-button {
+            font-size: 20px; /* 增加字体大小 */
+            padding: 10px 20px; /* 增加内边距 */
+            margin: 5px; /* 增加外边距 */
+            cursor: pointer; /* 鼠标悬停时显示手形指针 */
+        }
+    
+        .word-translation-container {
+            display: flex;
+            justify-content: space-around; /* 增加列之间的间隙 */
+        }
+    
+        .word-column, .translation-column {
+            flex: 1;
+        }
+
+     /* ... 其他样式 ... */
+
+     #checkButton {
+        font-size: 20px; /* 增加字体大小 */
+        padding: 10px 20px; /* 增加内边距 */
+        margin: 10px 0; /* 增加与其他元素的间距 */
+        cursor: pointer; /* 鼠标悬停时显示手形指针 */
+        background-color: #4CAF50; /* 设置底色 */
+        color: rgb(19, 18, 18); /* 设置字体颜色 */
+        border: none; /* 移除边框 */
+        border-radius: 5px; /* 圆角边框 */
+    }
+
+    #checkButton:hover {
+        background-color: #45a049; /* 鼠标悬停时的底色 */
+    }
+    </style>
+    
+    <audio id="audio1" src="{{ url_for('static', filename='audios/word.wav') }}"></audio>
+    <audio id="audio2" src="{{ url_for('static', filename='audios/translation.mp3') }}"></audio>
+    <audio id="audio3" src="{{ url_for('static', filename='audios/error.mp3') }}"></audio>
+
+    
+    <script>
+        let selectedWord = null;
+        let selectedTranslation = null;
+        let matches = {}; // 存储单词和翻译的对应关系
+        let wordGroup = {{ word_group | tojson }};
+        wordGroup.forEach(pair => {
+            matches[pair[0]] = pair[1].toString();
+        });
+        //console.log(matches);
+        let wordButtons = {};
+        let translationButtons = {};
+    function playSound(soundId) {
+        var sound = document.getElementById(soundId);
+        sound.play();
+    }
+    function selectWord(word, buttonId) {
+        playSound('audio1');
+        selectedWord = word;
+        console.log("Selected word: " + word); // 打印所选单词
+        checkMatch(buttonId);
+    }
+
+    function selectTranslation(translation, buttonId) {
+        playSound('audio1');
+        selectedTranslation = translation;
+        console.log("Selected translation: " + translation); // 打印所选翻译
+        checkMatch(buttonId);
+    }
+    function showCustomAlert(message) {
+        document.getElementById('alertMessage').textContent = message;
+        document.getElementById('customAlert').style.display = 'block';
+    }
+
+    function closeCustomAlert() {
+    document.getElementById('customAlert').style.display = 'none';
+    }
+    
+        function checkMatch(buttonId) {
+            if (selectedWord && selectedTranslation) {
+                //console.log("Expected translation for '" + selectedWord + "': " + matches[selectedWord]);
+                //console.log("Selected translation: " + selectedTranslation);
+
+
+                if (matches[selectedWord] === selectedTranslation) {
+                    // 匹配成功
+                    wordButtons[selectedWord].disabled = true;
+                    translationButtons[selectedTranslation].disabled = true;
+                } else {
+                    // 匹配失败
+                    //alert('Incorrect match, please try again.');
+                    showCustomAlert('你再想想');
+                }
+                selectedWord = null;
+                selectedTranslation = null;
+            }
+        }
+
+    function checkCompletion() {
+    for (let word in wordButtons) {
+        if (!wordButtons[word].disabled || !translationButtons[matches[word]].disabled) {
+            document.getElementById("alertImage").src = "{{ url_for('static', filename='pics/icon/notAll.png') }}"; // 设置警告图片路径
+            document.getElementById("alertMessage").textContent = "你还没选完啊."; // 设置警告消息文本
+            document.getElementById("customAlert").style.display = "block"; // 显示 customAlert
+            return;
+        }
+    }
+    // 创建隐藏的输入字段并提交表单
+    let hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'finish_group';
+    hiddenInput.value = 'True';
+    document.querySelector('form').appendChild(hiddenInput);
+    document.querySelector('form').submit();
+}
+
+function closeCustomAlert() {
+    document.getElementById("customAlert").style.display = "none"; // 隐藏 customAlert
+}
+
+
+        // 在页面加载时，初始化按钮引用
+        window.onload = function() {
+            document.querySelectorAll('.word-button').forEach(button => {
+                wordButtons[button.getAttribute('data-word')] = button;
+            });
+            document.querySelectorAll('.translation-button').forEach(button => {
+                translationButtons[button.getAttribute('data-translation')] = button;
+            });
+        };
+    </script>
+</head>
+<body>
+    <h1>Exam Mode</h1>
+    <form action="{{ url_for('exam_mode_page') }}" method="post">
+        <div class="word-translation-container">
+            <div class="word-column">
+                {% for word, translation in word_group %}
+                    <button type="button" class="word-button" data-word="{{ word }}" onclick="selectWord('{{ word }}', this.id)">{{ word }}</button><br>
+                {% endfor %}
+            </div>
+            <div class="translation-column">
+                {% for translation in translations %}
+                    <button type="button" class="translation-button" data-translation="{{ translation }}" onclick="selectTranslation('{{ translation }}', this.id)">{{ translation }}</button><br>
+                {% endfor %}
+            </div>
+        </div>
+        
+               
+        <br>
+        <input type="button" value="检查" onclick="checkCompletion()" id="checkButton">
+    </form>
+</body>
+</html>

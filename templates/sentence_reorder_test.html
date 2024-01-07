@@ -42,6 +42,7 @@
 <body>
     <h1>按照给出的中文，写出正确的英文句子</h1>
     <p>Translate this sentence: {{ example_cn }}</p>
+    <p>Remaining sentences: <span id="remaining_sentences">{{ remaining_sentences }}</span> / {{ total_sentences }}</p>
     <form action="{{ url_for('sentence_reorder_test') }}" method="post" onsubmit="prepareSubmission()">
         {% for word in jumbled_words %}
             <button type="button" onclick="addToSentence('{{ word }}')">{{ word }}</button>
@@ -71,9 +72,14 @@
         }
 
     function speakWord(word) {
+        word = word.replace("didn't", "did not")
+                .replace("What's", "What is");
+                // 添加更多替换规则...
+
         var msg = new SpeechSynthesisUtterance(word);
         window.speechSynthesis.speak(msg);
-        }
+    }
+
         function readAllWords() {
         var sentence = Array.from(document.querySelectorAll('#sentence_div .word-span'))
                         .map(span => span.textContent.replace('X', '').trim())
@@ -90,6 +96,12 @@
             hiddenInput.name = 'reordered_sentence';
             hiddenInput.value = sentence;
             document.querySelector('form').appendChild(hiddenInput);
+            updateRemainingSentences();
+        }
+        function updateRemainingSentences() {
+            var remaining = document.getElementById('remaining_sentences');
+            var currentCount = parseInt(remaining.textContent);
+            remaining.textContent = currentCount - 1;
         }
 
     </script>
