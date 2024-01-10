@@ -138,7 +138,7 @@ def generate_random_indexes(words):
     """
     return random.sample(range(len(words)), len(words))
 
-def generate_dummy_choices(correct_answer, all_answers, num_dummies=3):
+def generate_dummy_choices(correct_answer, all_answers, num_dummies=2):
     """
     Generate dummy choices for a quiz question.
     """
@@ -147,7 +147,7 @@ def generate_dummy_choices(correct_answer, all_answers, num_dummies=3):
     random.shuffle(dummy_choices)
     return dummy_choices
 
-def generate_dummy_choices_new(correct_answer, all_answers, num_dummies=3):
+def generate_dummy_choices_new(correct_answer, all_answers, num_dummies=2):
     """
     Generate dummy choices for a quiz question.
     Given the new dictionary structure, where each word has a dictionary
@@ -245,11 +245,14 @@ def exam_mode_page():
             return redirect(url_for('exam_mode_page'))  # 重定向以加载新组
 
     group_index = session.get('current_group_index', 0)
+    total_groups = len(session.get('word_groups', []))
+    remaining_groups = total_groups - group_index
+
     word_group = session.get('word_groups', [[]])[group_index]
 
     translations = [translation for _, translation in word_group]
     random.shuffle(translations)  # 打乱翻译
-    return render_template('exam_mode_page.html', word_group=word_group,translations=translations)
+    return render_template('exam_mode_page.html', word_group=word_group,translations=translations,remaining_groups=remaining_groups)
 
 
 

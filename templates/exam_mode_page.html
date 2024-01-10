@@ -15,6 +15,11 @@
 <!-- 页面的其他内容 -->
 
     <style>
+        .remaining-groups img {
+            width: 60px; /* 或其他合适的尺寸 */
+            height: auto;
+            vertical-align: middle;
+            }
         .word-button, .translation-button {
             font-size: 20px; /* 增加字体大小 */
             padding: 10px 20px; /* 增加内边距 */
@@ -72,7 +77,7 @@
     function selectWord(word, buttonId) {
         playSound('audio1');
         selectedWord = word;
-        console.log("Selected word: " + word); // 打印所选单词
+        //console.log("Selected word: " + word); // 打印所选单词
         checkMatch(buttonId);
     }
 
@@ -147,6 +152,15 @@ function closeCustomAlert() {
 </head>
 <body>
     <h1>Exam Mode</h1>
+    <p class="remaining-groups">Remaining groups: {{ remaining_groups }}
+        {% if remaining_groups > 4 %}
+            <img src="{{ url_for('static', filename='pics/icon/cry.png') }}" alt="Cry">
+        {% elif remaining_groups > 1 %}
+            <img src="{{ url_for('static', filename='pics/icon/angery.png') }}" alt="Angry">
+        {% else %}
+            <img src="{{ url_for('static', filename='pics/icon/happy.png') }}" alt="Happy">
+        {% endif %}
+    </p>    
     <form action="{{ url_for('exam_mode_page') }}" method="post">
         <div class="word-translation-container">
             <div class="word-column">

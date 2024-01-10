@@ -36,7 +36,7 @@
     <!-- 显示例句和阅读按钮 -->
     <p style="font-size: larger;">例句: {{ example_en }}</p>
     <p style="font-size: larger;">例句翻译: {{ example_cn }}</p>
-    <button type="button" onclick="speak('{{ example_en | safe }}')" style="margin-bottom: 10px;">朗读英文例句</button>
+    <button type="button" onclick="playAudio('{{ word_en | safe }}')" style="margin-bottom: 10px;">朗读英文例句</button>
     <!-- 添加“下一个单词”按钮 -->
     <form method="post" style="margin-top: 10px;">
         <button type="submit" name="next_word">Next Word</button>
@@ -54,6 +54,14 @@
         var msg = new SpeechSynthesisUtterance(text);
         window.speechSynthesis.speak(msg);
     }
+
+    function playAudio(word) {
+    var audioPath = "{{ url_for('static', filename='audios/sentence/') }}" + word + "_sentence.mp3";
+    var audio = new Audio(audioPath);
+    audio.play();
+}
+
+
     function validateAndSubmit() {
         var radios = document.getElementsByName('word_choice');
         var formIsValid = false;
