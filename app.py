@@ -7,6 +7,7 @@ import glob
 import importlib
 import random
 import csv
+import string 
 from itertools import chain
 from database import db, init_db
 
@@ -160,53 +161,69 @@ def generate_dummy_choices_new(correct_answer, all_answers, num_dummies=2):
     random.shuffle(dummy_choices)
     return dummy_choices
 
+def generate_full_dummy_choices(correct_answer, all_answers, num_choices=3):
+    """
+    Generate dummy choices for a quiz question.
+    Returns a dictionary of choices.
+    """
+    print(num_choices)
+    if num_choices < 2:
+        raise ValueError("Number of choices must be at least 2")
+
+    # Get dummy answers and ensure the correct answer is not included
+    dummies = [word for word in all_answers if word != correct_answer]
+    if len(dummies) < num_choices - 1:
+        raise ValueError("Not enough unique dummy choices available")
+
+    # Randomly select dummy answers
+    dummy_choices = random.sample(dummies, num_choices - 1)
+    dummy_choices.append(correct_answer)
+    random.shuffle(dummy_choices)
+
+    # Assign choices to labels (e.g., 'a', 'b', 'c', ...)
+    choice_labels = list(string.ascii_lowercase)[:num_choices]
+    choices = dict(zip(choice_labels, dummy_choices))
+
+    return choices
+def obscure_word(word, num_letters=1):
+    """随机隐藏单词中的一或两个字母。"""
+    if len(word) <= 1:
+        return word
+
+    word_as_list = list(word)
+    for _ in range(num_letters):
+        replace_index = random.randint(0, len(word_as_list) - 1)
+        word_as_list[replace_index] = '_'
+    return ''.join(word_as_list)
+
 @app.route('/test_cn_to_en', methods=['GET', 'POST'])
 def test_cn_to_en():
-    # Ensure the user is logged in
     if 'username' not in session:
         return redirect(url_for('login'))
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
+    if 'random_indexes' not in session:
+        session['random_indexes'] = generate_random_indexes(words)  
+        session['word_index'] = 0
+    # 获取当前单词
+    current_index = session['random_indexes'][session['word_index']]
+    word_en, word_cn = list(words.items())[current_index]
+    word_en_with_blanks = obscure_word(word_en, num_letters=random.randint(1, 2))
+    return render_template('test_cn_to_en.html', word_cn=word_cn, word_en_with_blanks=word_en_with_blanks, word_en=word_en)
 
-    # Check if the book and module are selected
-    #if 'selected_book' not in session or 'selected_module' not in session:
-     #   return redirect(url_for('select_book'))
+@app.route('/submit_answer', methods=['POST'])
+def submit_answer():
+    user_answer = request.form['answer'].strip()
+    word_en = request.form['word_en'].strip()
 
-    # Dynamically import the selected book's module
-    #book_module = importlib.import_module(f"books.{session['selected_book']}")
-    #modules = book_module.modules  # Access the 'modules' dictionary from the imported book module
-
-    # Get the selected module's words
-   # words = modules[session['selected_module']]
-    if 'selected_book' not in session or 'selected_module' not in session:
-        return redirect(url_for('select'))  # Redirect to combined selection route
-
-    # Dynamically import the selected book's module
-    book_module = importlib.import_module(f"books.{session['selected_book']}")
-
-    # Get the selected module's words
-    words = book_module.modules[session['selected_module']]  # Directly access the 'modules' dictionary from the imported book module
-    #print(session)
-    if 'current_word' not in session or session['current_word'] not in words:
-        session['current_word'] = list(words.keys())[0]
-    
-
-    if request.method == 'POST':
-        user_input = request.form.get('word_input')
-        if check_answer(user_input, session['current_word']):
-            record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True)
-            #record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], True, "cn_to_en")
-            current_index = list(words.keys()).index(session['current_word'])
-            if current_index + 1 < len(words):
-                session['current_word'] = list(words.keys())[current_index + 1]
-            else:
-                session.clear()
-                return "Module completed!"
+    if user_answer.lower() == word_en.lower():
+        session['word_index'] += 1
+        if session['word_index'] >= len(session['random_indexes']):
+            return redirect(url_for('learning_results'))
         else:
-            record_data(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False)
-            #record_to_db(session['username'], session['current_word'], session['selected_book'], session['selected_module'], False, "cn_to_en")
-            image_path = get_image_path(session['current_word'])         
-            return render_template('test_cn_to_en.html', word=words[session['current_word']], image_path=image_path)
-    
-    return render_template('test_cn_to_en.html', word=words[session['current_word']])
+            return redirect(url_for('test_cn_to_en'))
+    else:
+        return redirect(url_for('test_cn_to_en', correct=False))
 
 @app.route('/exam_mode', methods=['GET'])
 def exam_mode():
@@ -396,7 +413,7 @@ def test_en_to_cn():
     if request.method == 'POST':
         choices = session.get('previous_choices')
         user_choice = request.form.get('word_choice')
-        print('use choose abc is ',user_choice)
+        #print('use choose abc is ',user_choice)
         correct_answer = word_cn
             #print('user choice is ',choices[user_choice])
         if choices[user_choice] == correct_answer:
@@ -425,12 +442,13 @@ def test_en_to_cn():
     else:
         # 生成不包含正确答案的假选项
         correct_answer = word_cn
-        dummy_choices = generate_dummy_choices(correct_answer, words.values())
-        choices = {
-            'a': dummy_choices[0],
-            'b': dummy_choices[1],
-            'c': dummy_choices[2]
-        }
+        #dummy_choices = generate_dummy_choices(correct_answer, words.values())
+        #choices = {
+        #    'a': dummy_choices[0],
+        #    'b': dummy_choices[1],
+        #    'c': dummy_choices[2]
+        #}
+        choices = generate_full_dummy_choices(correct_answer, words.values(), num_choices=4)
         session['previous_choices'] = choices
     #print(choices)
     # 显示当前单词和选项
@@ -511,7 +529,7 @@ def test_mode_en_to_cn():
     word_en, word_cn = list(words.items())[current_index]
     #print('现在测试的答案是', word_cn)
     #print('english world', word_en)
-    print(current_index)  
+    #print(current_index)  
 
     if 'random_indexes' not in session:
         session['random_indexes'] = random.sample(range(len(words)), len(words))

@@ -240,7 +240,7 @@ modules = {
             }
         },
         "took": {
-            'translation': "take 的过去式，需要花费",
+            'translation': "take 的过去式，需要，花费",
             'sentences': {
                 'example_en': 'It took us about ten minutes to get there.',
                 'example_cn': '我们大约花了十分钟到那儿。'

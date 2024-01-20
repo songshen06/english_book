@@ -1,29 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>中文到英文测试</title>
-    <!-- Add this line to include the JavaScript file for speech -->
-    <script src="{{ url_for('static', filename='speech.js') }}"></script>
-    <style>
-        .button-container {
-            margin-top: 10px;  /* 设置按钮与输入框之间的距离 */
-        }
-    </style>
+    <title>单词拼写测试</title>
 </head>
 <body>
-    <h2>请将以下中文词汇翻译成英文:</h2>
-    <p>{{ word }}</p>
-    <form method="post" action="{{ url_for('test_cn_to_en') }}">
-        <input type="text" name="word_input" required>
-        <div class="button-container">
-            <button type="submit">提交</button>
-            <!-- Pronunciation button -->
-            <button type="button" onclick="speakInput()">朗读单词</button>
-            <button type="button" id="record-button">发音对比</button>
-        </div>
+    <h1>单词拼写测试</h1>
+
+    <!-- 图片显示区域 -->
+    <img id="emotionIcon" src="{{ url_for('static', filename='pics/icon/cry.png') }}" alt="Cry">
+
+    <p><strong>提示：</strong>{{ word_cn }}</p>
+    <p><strong>单词：</strong>{{ word_en_with_blanks }}</p>
+    
+    <form id="answerForm" method="post">
+        <label for="answer">输入完整单词:</label>
+        <input type="text" id="answer" name="answer">
+        <button type="button" onclick="checkAnswer()">提交</button>
     </form>
-    {% if image_path %}
-    <img src="{{ image_path }}" alt="Hint">
-    {% endif %}
+
+    <!-- 点击此按钮才会提交答案并进入下一个单词 -->
+    <form method="post" action="/submit_answer" id="nextWordForm" style="display:none;">
+        <input type="hidden" name="word_en" value="{{ word_en }}">
+        <input type="hidden" name="answer" id="hiddenAnswer">
+        <button type="submit">下一个单词</button>
+    </form>
+
+    <script>
+        function checkAnswer() {
+            var userAnswer = document.getElementById('answer').value;
+            var correctAnswer = '{{ word_en }}';
+            var nextWordForm = document.getElementById('nextWordForm');
+            var emotionIcon = document.getElementById('emotionIcon');
+            var hiddenAnswer = document.getElementById('hiddenAnswer');
+
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                emotionIcon.src = "{{ url_for('static', filename='pics/icon/happy.png') }}";
+                emotionIcon.alt = "Happy";
+                hiddenAnswer.value = userAnswer; // 设置隐藏表单的答案
+                nextWordForm.style.display = 'block'; // 显示下一个单词的按钮
+            } else {
+                alert('答案不正确，请重试！');
+            }
+        }
+
+        // 处理回车键提交
+        document.getElementById('answer').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 阻止默认回车行为
+                checkAnswer();
+            }
+        });
+
+        // 页面加载时显示默认图片
+        window.onload = function() {
+            document.getElementById('emotionIcon').style.display = 'block';
+        };
+    </script>
 </body>
 </html>

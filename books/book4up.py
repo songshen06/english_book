@@ -37,7 +37,7 @@ modules = {
         'phone': '打电话',
     },
     'Module 3': {
-        "didn't": '不',
+        "did not": "不, didn't",
         'National Day': '国庆节',
         'stay': '停留',
         'what': '什么',

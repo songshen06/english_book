@@ -1086,3 +1086,5 @@ ss,2023-12-31 08:44:36,bump,book4up,"['Module Number', 'Module 7', 'Module 8', '
 ss,2024-01-04 13:34:20,dear,book4up,['Module 1'],fault
 ss,2024-01-04 20:53:47,dear,book4up_sentence,['Module 1'],fault
 ss,2024-01-04 20:55:27,love,book4up_sentence,['Module 1'],fault
+ss,2024-01-20 18:34:16,eleven,book4up,"['Module Number', 'Module 1']",correct
+ss,2024-01-20 18:38:49,forty,book4up,"['Module Number', 'Module 1']",correct
