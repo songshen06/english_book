@@ -10,6 +10,9 @@
     <img id="emotionIcon" src="{{ url_for('static', filename='pics/icon/cry.png') }}" alt="Cry">
 
     <p><strong>提示：</strong>{{ word_cn }}</p>
+    <!-- 播放单词的按钮 -->
+    <button onclick="speak('{{ word_en }}')">播放单词</button>
+
     <p><strong>单词：</strong>{{ word_en_with_blanks }}</p>
     
     <form id="answerForm" method="post">
@@ -26,6 +29,12 @@
     </form>
 
     <script>
+        function speak(text) {
+            var synth = window.speechSynthesis;
+            var utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+
         function checkAnswer() {
             var userAnswer = document.getElementById('answer').value;
             var correctAnswer = '{{ word_en }}';

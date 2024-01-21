@@ -67,8 +67,10 @@ def select():
                 #if selected_module in modules:
                 session['selected_modules'] = selected_modules
                 print(session)
-                if selected_test_type == "cn_to_en":
+                if selected_test_type == "cn_to_en": #看中文补充单词
                     return redirect(url_for('test_cn_to_en'))
+                elif selected_test_type == "listening_test": #听力测试
+                    return redirect(url_for('listening_test'))                
                 elif selected_test_type == "en_to_cn": #看英文选中文
                     return redirect(url_for('test_en_to_cn'))
                 elif selected_test_type == "cn_to_m_en":  # 看中文，选英文
@@ -513,6 +515,58 @@ def test_cn_to_m_en():
         return redirect(url_for('select'))
 
     return render_template('test_cn_to_m_en.html', word_cn=word_cn, choices=choices)
+
+@app.route('/listening_test', methods=['GET', 'POST'])
+def listening_test():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
+    else:
+        # 如果没有选择书籍和模块，则重定向或者加载默认单词
+        return redirect(url_for('select_book'))
+
+    if 'random_indexes' not in session:
+        session['random_indexes'] = random.sample(range(len(words)), len(words))
+        session['word_index'] = 0
+        session['test_results'] = []
+
+    # 检查是否已测试完所有单词
+    if session['word_index'] >= len(session['random_indexes']):
+        # 处理所有单词都已测试的情况
+        correct_answers_count = sum([result['correct'] for result in session['test_results']])
+        total_questions = len(session['test_results'])
+        accuracy = int((correct_answers_count / total_questions) * 100)
+        correct_answers = [result for result in session['test_results'] if result['correct']]
+        incorrect_answers = [result for result in session['test_results'] if not result['correct']]
+
+        # 清理 session 数据
+        for key in ['selected_book', 'selected_modules', 'word_index', 'test_results', 'random_indexes']:
+            session.pop(key, None)
+
+        return render_template('test_report.html', correct_answers=correct_answers, incorrect_answers=incorrect_answers, accuracy=accuracy)
+
+    current_index = session['random_indexes'][session['word_index']]
+    word_en, word_cn = list(words.items())[current_index]
+
+    if request.method == 'POST':
+        user_choice = request.form.get('word_choice')
+        correct_answer = word_en
+
+        result_data = {
+            'word': word_en,
+            'correct': user_choice == correct_answer
+        }
+        session['test_results'].append(result_data)
+
+        session['word_index'] += 1
+        return redirect(url_for('listening_test'))
+    else:
+        # 生成选择题选项
+        choices = generate_full_dummy_choices(word_en, list(words.keys()), num_choices=4)
+        return render_template('listen_test.html', word_en=word_en, word_cn=word_cn, choices=choices)
+
 
 @app.route('/test_mode_en_to_cn', methods=['GET', 'POST'])   #考试模式
 def test_mode_en_to_cn():

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>听力测试</title>
+    <style>
+        /* 在这里添加任何必要的 CSS 样式 */
+    </style>
+</head>
+<body>
+    <h1>听力测试</h1>
+
+    <p>请听以下单词的发音并选择正确的英文单词:</p>
+
+    <!-- 单词中文含义提示 -->
+    <p>提示: {{ word_cn }}</p>
+
+    <!-- 播放发音的按钮 -->
+    <button onclick="speak('{{ word_en }}')">播放发音</button>
+
+    <!-- 赞扬信息，一开始隐藏 -->
+    <p id="praiseMessage" style="display:none;">太棒了! 👍</p>
+    
+    <!-- 选择题表单 -->
+    <form id="choiceForm" method="post">
+        <!-- 隐藏字段用于存储英文单词 -->
+        <input type="hidden" name="word_en" value="{{ word_en }}">
+
+        {% for label, choice in choices.items() %}
+            <div>
+                <input type="radio" id="choice{{ label }}" name="word_choice" value="{{ choice }}">
+                <label for="choice{{ label }}">{{ choice }}</label>
+            </div>
+        {% endfor %}
+        <button type="button" onclick="checkAnswer()">提交答案</button>
+    </form>
+
+    <!-- 进入下一个问题的按钮，一开始隐藏 -->
+    <button id="nextQuestionButton" style="display:none;" onclick="nextQuestion()">下一个单词</button>
+
+    <script>
+        function speak(text) {
+            var synth = window.speechSynthesis;
+            var utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+
+        function checkAnswer() {
+            var userChoice = document.querySelector('input[name="word_choice"]:checked').value;
+            var correctAnswer = document.querySelector('input[name="word_en"]').value;
+            var praiseMessage = document.getElementById('praiseMessage');
+            var nextQuestionButton = document.getElementById('nextQuestionButton');
+
+            if (userChoice === correctAnswer) {
+                praiseMessage.style.display = 'block';
+                nextQuestionButton.style.display = 'block'; // 显示进入下一个问题的按钮
+            } else {
+                praiseMessage.style.display = 'none';
+                nextQuestionButton.style.display = 'none';
+                // 如果需要，可以在这里处理错误答案的情况
+            }
+        }
+
+        function nextQuestion() {
+            // 提交表单以进入下一个问题
+            document.getElementById('choiceForm').submit();
+        }
+    </script>
+</body>
+</html>

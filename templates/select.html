@@ -70,35 +70,39 @@
         <h2>Select Test Type</h2>
         <!-- 常规测试类型选项 -->
         <label class="testTypeOption">
-            <input type="radio" name="test_type" value="cn_to_en"> 看中文，写英文
+            <input type="radio" name="test_type" value="cn_to_en"> 看中文，补充英文
         </label>
-        <br><br>
+        <br>
         <label class="testTypeOption">
             <input type="radio" name="test_type" value="en_to_cn"> 看英文，选择中文
         </label>
-        <br><br>
+        <br>
         <label class="testTypeOption">
             <input type="radio" name="test_type" value="cn_to_m_en"> 英文和中文匹配
         </label>
-        <br><br>
+        <br>
         <label class="testTypeOption">
             <input type="radio" name="test_type" value="test_mode_en_to_cn"> 看英文，选择中文(考试模式)
         </label>
-        <br><br>
+        <br>
         <label class="testTypeOption">
             <input type="radio" name="test_type" value="retest_mode_en_to_cn"> 看英文，选择中文（不做完不结束）
         </label>
-        <br><br>
+        <br>
+        <label class="testTypeOption">
+            <input type="radio" name="test_type" value="listening_test"> 听力测试
+        </label>
+        <br>
 
         <!-- 特定测试类型选项 -->
         <label class="testTypeOption" id="specialTestTypeOption1" style="display: none;">
             <input type="radio" name="test_type" value="read_en_to_cn"> 看英文，选择中文(有例句)
         </label>
-        <br><br>
+        <br>
         <label class="testTypeOption" id="specialTestTypeOption2" style="display: none;">
             <input type="radio" name="test_type" value="sentence_reorder_test"> 语句排序
         </label>
-        <br><br>
+        <br>
         <input type="submit" value="Start Test">
     </form>
 
