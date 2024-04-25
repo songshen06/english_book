@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash,jsonify
 import os
+import json
 #from words import modules
 from test_utils import check_answer, get_image_path
 from data_recorder import record_data,record_result
@@ -9,19 +10,21 @@ import random
 import csv
 import string 
 from itertools import chain
-from database import db, init_db
+from chat import generate_answer,extract_json_from_text
+from datetime import datetime
+#from database import db, init_db
 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # For session management
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-db.init_app(app)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+#db.init_app(app)
 
 # 创建数据库和表
-with app.app_context():
-    db.drop_all()  # 先删除所有旧的表结构
-    db.create_all()  # 创建新的表结构
+#with app.app_context():
+#    db.drop_all()  # 先删除所有旧的表结构
+#    db.create_all()  # 创建新的表结构
 
 @app.route('/')
 def index():
@@ -67,8 +70,8 @@ def select():
                 #if selected_module in modules:
                 session['selected_modules'] = selected_modules
                 print(session)
-                if selected_test_type == "cn_to_en": #看中文补充单词
-                    return redirect(url_for('test_cn_to_en'))
+                if selected_test_type == "word_matching": #看中文输入中文意思
+                    return redirect(url_for('word_matching_test'))
                 elif selected_test_type == "listening_test": #听力测试
                     return redirect(url_for('listening_test'))                
                 elif selected_test_type == "en_to_cn": #看英文选中文
@@ -568,104 +571,53 @@ def listening_test():
         return render_template('listen_test.html', word_en=word_en, word_cn=word_cn, choices=choices)
 
 
-@app.route('/test_mode_en_to_cn', methods=['GET', 'POST'])   #考试模式
+@app.route('/test_mode_en_to_cn', methods=['GET', 'POST'])
 def test_mode_en_to_cn():
     # Ensure the user is logged in
     if 'username' not in session:
         return redirect(url_for('login'))
+
+    # Initialize words and random indexes
     if 'selected_book' in session and 'selected_modules' in session:
         words = load_words(session['selected_book'], session['selected_modules'])
-    if 'random_indexes' not in session:
-        session['random_indexes'] = generate_random_indexes(words)  
-        session['word_index'] = 0
-    # 获取当前单词
-    current_index = session['random_indexes'][session['word_index']]
-    word_en, word_cn = list(words.items())[current_index]
-    #print('现在测试的答案是', word_cn)
-    #print('english world', word_en)
-    #print(current_index)  
+    else:
+        return redirect(url_for('select_book_module'))  # Redirect to book/module selection if not set
 
     if 'random_indexes' not in session:
         session['random_indexes'] = random.sample(range(len(words)), len(words))
         session['word_index'] = 0
-    # 检查是否已测试完所有单词
+
+    if 'test_results' not in session:
+        session['test_results'] = []
+
+    # Check if all words have been tested
     if session['word_index'] >= len(session['random_indexes']):
-        # 处理所有单词都已测试的情况
-        # 计算准确率，显示测试结果，或者重定向到其他页面
-        # ...
-        correct_answers_count = sum([result['correct'] for result in session['test_results']])
-        total_questions = len(session['test_results'])
-        #accuracy = (correct_answers_count / total_questions) * 100
-        accuracy = int((correct_answers_count / total_questions) * 100)
+        # Calculate results and clean up session
+        correct_answers_count = sum(result['correct'] for result in session['test_results'])
+        accuracy = int((correct_answers_count / len(session['test_results'])) * 100)
         correct_answers = [result for result in session['test_results'] if result['correct']]
         incorrect_answers = [result for result in session['test_results'] if not result['correct']]
-        #print(incorrect_answers)
-        #incorrect_words = [result['word'] for result in incorrect_answers]
-
-    # 如果你想将这些单词记录到数据库，你可以遍历 incorrect_words 列表，并为每个单词调用你的记录函数。
-        #for word in incorrect_words:
-    # 假设 record_word 是你用来记录单词到数据库的函数
-            
-        record_result(session['username'], session['selected_book'], session['selected_modules'],accuracy )
-        
-        # Clean up session data
-        for key in ['selected_book', 'selected_modules', 'word_index', 'test_results']:
+        record_result(session['username'], session['selected_book'], session['selected_modules'], accuracy)
+        for key in ['selected_book', 'selected_modules', 'word_index', 'random_indexes', 'test_results']:
             if key in session:
                 del session[key]
-
-    # Render the test report template with correct and incorrect answers as well as accuracy
         return render_template('test_report.html', correct_answers=correct_answers, incorrect_answers=incorrect_answers, accuracy=accuracy)
-    
-# 获取当前单词
+
+    # Display current word and choices
     current_index = session['random_indexes'][session['word_index']]
     word_en, word_cn = list(words.items())[current_index]
-    #print('现在测试的答案是', word_cn)
-    #print('english world', word_en)
-    print(current_index)  
 
-    #if 'word_index' not in session:
-    #    session['word_index'] = 0
-    #    session['test_results'] = []  # Initialize test results
-    
-    if 'test_results' not in session:
-       # session['test_results'] = {}
-       session['test_results'] = []
+    if request.method == 'POST':
+        user_choice = request.form.get('word_choice')
+        session['test_results'].append({'word': word_en, 'correct': (user_choice == word_cn)})
+        session['word_index'] += 1
+        return redirect(url_for('test_mode_en_to_cn'))
 
-    word_keys = list(words.keys())
-    if session['word_index'] < len(word_keys):
-        #word_en = word_keys[session['word_index']]
-        #word_cn = words[word_en]
-
-        #del words[word_en]
-        #print(words)
-
-        if request.method == 'POST':
-            choices = session.get('previous_choices')
-            user_choice = request.form.get('word_choice')
-            correct_answer = word_cn
-
-            result_data = {
-                'word': word_en,
-                'correct': choices[user_choice] == correct_answer
-            }
-            session['test_results'].append(result_data)
-
-            session['word_index'] += 1
-            return redirect(url_for('test_mode_en_to_cn'))
-        else:
-            #dummy_choices = random.sample(list(words.values()), 2)
-            # 生成不包含正确答案的假选项
-            correct_answer = word_cn
-            dummy_choices = generate_dummy_choices(correct_answer, words.values())
-            choices = {
-                'a': dummy_choices[0],
-                'b': dummy_choices[1],
-                'c': dummy_choices[2],
-                'd': dummy_choices[3]
-            }
-
-            session['previous_choices'] = choices
+    choices = generate_full_dummy_choices(word_cn, words.values(), num_choices=4)
+    session['previous_choices'] = choices
     return render_template('test_mode_en_to_cn.html', word_en=word_en, choices=choices)
+
+
 
 @app.route('/retest_mode_en_to_cn', methods=['GET', 'POST']) #不做完不结束
 def retest_mode_en_to_cn():
@@ -743,6 +695,90 @@ def retest_mode_en_to_cn():
 
     return render_template('retest_mode_en_to_cn.html', word_en=word_en, choices=choices)  # 渲染测试模式模板
 
+@app.route('/word_matching_test')
+def word_matching_test():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
+    english_words = list(words.keys())
+    # 在会话中跟踪已测验的单词
+    if 'index' not in session:
+        session['index'] = 0
+    word = english_words[session['index']]
+    return render_template('word_test.html', word=word)
+
+@app.route('/submit_word_test', methods=['POST'])
+def submit_word_test():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    english_word = request.form['english_word']
+    chinese_word = request.form['chinese_word'].strip()
+
+    if not chinese_word:
+        return jsonify({"error": "No answer provided"}), 400
+
+    # 假设这里是调用外部服务的逻辑
+
+    prompt = f"""
+这个英文单词“{english_word}”的翻译是“{chinese_word}”吗？
+将你的响应格式化为以 {english_word}和 “答案解释”为键的 JSON 对象。
+{english_word} 键，如果是，请使用 “正确” 作为值。如果不是，请使用“错误”为值。
+“答案解释”键的值，是你判断的理由。
+注意只需要输出JSON 对象。
+""" 
+    print(prompt)
+    response =generate_answer(prompt)
+    print(response)
+    #data =json.loads(response)
+    data = json.loads(extract_json_from_text(response))
+    print(data)
+
+
+    # 记录答案到 CSV
+    with open('answers.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        writer.writerow([now, english_word,chinese_word, data[english_word], data['答案解释']])
+
+    # 更新单词索引
+    if 'selected_book' in session and 'selected_modules' in session:
+        words = load_words(session['selected_book'], session['selected_modules'])
+    english_words = list(words.keys())
+    #session['index'] = (session['index'] + 1) % len(english_words)
+        # 更新单词索引
+    next_index = (session['index'] + 1) % len(english_words)
+    session['index'] = next_index
+    print(f"next_index: {next_index}")
+
+
+    #return jsonify(response)
+    response = {
+        english_word: data[english_word],
+        "答案解释": data['答案解释'],
+        "test_completed": next_index == 0
+            }
+
+    return jsonify(response)
+
+@app.route('/csv_summary')
+def csv_summary():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    today = datetime.now().strftime('%Y-%m-%d')  # 获取当前日期
+    answers = []
+
+    # 打开 CSV 文件并读取只属于当天的条目
+    with open('answers.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            # 检查记录的日期是否是今天
+            if row[0].startswith(today):
+                answers.append(row)
+
+    return render_template('csv_summary.html', answers=answers)
 @app.route('/retest_results')
 def retest_results():
     #selected_book = session.get('selected_book', 'Unknown Book')
@@ -784,4 +820,4 @@ def initdb_command():
     print('Initialized the database.')
 
 if __name__ == '__main__':
-    app.run(debug=True,port=8080)
+    app.run(debug=True,port=8070)

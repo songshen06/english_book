@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Word Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label, button {
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Word Test: {{ word }}</h1>
+    <form id="wordForm" action="/submit_word_test" method="post">
+        <input type="hidden" name="english_word" value="{{ word }}">
+        <label for="chinese_word">Your answer:</label>
+        <input type="text" id="chinese_word" name="chinese_word" required>
+        <button type="button" onclick="startDictation()">Speak</button>
+        <input type="submit" id="submitButton" value="Submit">
+    </form>
+    <button id="nextWordButton" style="display: none;" onclick="getNextWord()">Next Word</button>
+    <button id="summaryButton" style="display: none;" onclick="window.location.href='/csv_summary'">View Summary</button>
+    <div id="resultDisplay"></div>
+
+    <script>
+        document.getElementById('wordForm').onsubmit = function(event) {
+            event.preventDefault();
+            var submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true; // Disable the submit button to prevent multiple submissions
+            var formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+            .then(data => {
+                submitButton.disabled = false; // Re-enable the submit button
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    var resultText = `${data[formData.get('english_word')]}: ${data['答案解释']}`;
+                    document.getElementById('resultDisplay').innerHTML = resultText;
+                    if (data.test_completed) {
+                        document.getElementById('nextWordButton').style.display = 'none'; // Hide the "Next Word" button
+                        document.getElementById('summaryButton').style.display = 'block'; // Show the "View Summary" button
+                    } else {
+                        document.getElementById('nextWordButton').style.display = 'block'; // Show the "Next Word" button
+                    }
+                }
+            }).catch(error => {
+                submitButton.disabled = false; // Ensure the button is re-enabled in case of a fetch failure
+                console.error('Error during fetch operation:', error);
+                alert('An error occurred while submitting your response.');
+            });
+        };
+
+        function getNextWord() {
+            location.reload(); // Simply reload the page to request the next word
+        }
+
+        function startDictation() {
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = "zh-CN";
+            recognition.onresult = function(event) {
+                document.getElementById('chinese_word').value = event.results[0][0].transcript;
+            };
+            recognition.start();
+        }
+    </script>
+</body>
+</html>

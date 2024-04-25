@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Word Test</title>
+</head>
+<body>
+    <h1>Word Test: {{ word }}</h1>
+    <form id="wordForm" action="/submit_word_test" method="post">
+        <input type="hidden" name="english_word" value="{{ word }}">
+        <label for="chinese_word">Your answer:</label>
+        <input type="text" id="chinese_word" name="chinese_word" required>
+        <button type="button" onclick="startDictation()">Speak</button>
+        <input type="submit" value="Submit">
+    </form>
+    <button id="nextWordButton" style="display: none;" onclick="getNextWord()">Next Word</button>
+    <button id="summaryButton" style="display: none;" onclick="window.location.href='/csv_summary'">View Summary</button>
+    <div id="resultDisplay"></div>
+
+    <script>
+        document.getElementById('wordForm').onsubmit = function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    var resultText = `${data[formData.get('english_word')]}: ${data['答案解释']}`;
+                    document.getElementById('resultDisplay').innerHTML = resultText;
+                    if (data.test_completed) {
+                        document.getElementById('nextWordButton').style.display = 'none'; // 隐藏“下一个单词”按钮
+                        document.getElementById('summaryButton').style.display = 'block'; // 显示“查看汇总”按钮
+                    } else {
+                        document.getElementById('nextWordButton').style.display = 'block'; // 显示“下一个单词”按钮
+                    }
+                }
+            });
+        };
+
+        function getNextWord() {
+            location.reload(); // 简单地重新加载页面来请求下一个单词
+        }
+
+        function startDictation() {
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = "zh-CN";
+            recognition.onresult = function(event) {
+                document.getElementById('chinese_word').value = event.results[0][0].transcript;
+            };
+            recognition.start();
+        }
+    </script>
+</body>
+</html>
