@@ -33,7 +33,6 @@ modules = {
         "lie": "说谎，躺",
         "learnt": "学习（learn的过去式）",
         "lesson": "教训；一节课",
-        "wouldn't": "would not",
         "into": "进入……里面",
         "month": "月份",
         "cheese": "奶酪",
@@ -94,12 +93,21 @@ modules = {
         "language": "语言",
         "Australian": "澳大利亚的",
         "kangaroo": "袋鼠",
-        "back": "后面的"
+        "back": "后面的",
+        "uncle":"叔叔，舅舅",
+        "aunt" :"婶婶，舅妈"
     },
     "Module 10": {
         "postcard": "明信片",
         "plan": "计划",
         "museum": "博物馆",
         "restaurant": "餐馆，饭店"
+    },
+    "Module 11": {
+        "face": "脸",
+        "cousin": "表兄弟，表兄妹",
+        "important": "重要的",
+        "city": "城市",
+        "cary": "运输"
     }
 }

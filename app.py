@@ -708,6 +708,26 @@ def word_matching_test():
     word = english_words[session['index']]
     return render_template('word_test.html', word=word)
 
+
+
+
+def record_response(english_word, chinese_translation, response):
+    result = "对" if "对" in response else "错"
+    try:
+        response_json = json.loads(response)
+        explanation = response_json.get('explanation', '')
+        sentence = response_json.get('sentence', '')
+    except json.JSONDecodeError:
+        explanation = ""
+        sentence = ""
+    
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    with open('answers.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([now, english_word, chinese_translation, result, explanation, sentence])
+    
+    return result, explanation, sentence
+
 @app.route('/submit_word_test', methods=['POST'])
 def submit_word_test():
     if 'username' not in session:
@@ -719,48 +739,28 @@ def submit_word_test():
     if not chinese_word:
         return jsonify({"error": "No answer provided"}), 400
 
-    # 假设这里是调用外部服务的逻辑
+    response = generate_answer(english_word, chinese_word)
+    result, explanation, sentence = record_response(english_word, chinese_word, response)
 
-    prompt = f"""
-这个英文单词“{english_word}”的翻译是“{chinese_word}”吗？
-将你的响应格式化为以 {english_word}和 “答案解释”为键的 JSON 对象。
-{english_word} 键，如果是，请使用 “正确” 作为值。如果不是，请使用“错误”为值。
-“答案解释”键的值，是你判断的理由。
-注意只需要输出JSON 对象。
-""" 
-    print(prompt)
-    response =generate_answer(prompt)
-    print(response)
-    #data =json.loads(response)
-    data = json.loads(extract_json_from_text(response))
-    print(data)
-
-
-    # 记录答案到 CSV
-    with open('answers.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        writer.writerow([now, english_word,chinese_word, data[english_word], data['答案解释']])
-
-    # 更新单词索引
     if 'selected_book' in session and 'selected_modules' in session:
         words = load_words(session['selected_book'], session['selected_modules'])
-    english_words = list(words.keys())
-    #session['index'] = (session['index'] + 1) % len(english_words)
-        # 更新单词索引
-    next_index = (session['index'] + 1) % len(english_words)
-    session['index'] = next_index
-    print(f"next_index: {next_index}")
+        english_words = list(words.keys())
+        next_index = (session['index'] + 1) % len(english_words)
+        session['index'] = next_index
+        next_word = english_words[next_index]
 
+        return jsonify({
+            "current_word": english_word,
+            "result": result,
+            "explanation": explanation,
+            "sentence": sentence,
+            "next_word": next_word,
+            "test_completed": next_index == 0
+        })
 
-    #return jsonify(response)
-    response = {
-        english_word: data[english_word],
-        "答案解释": data['答案解释'],
-        "test_completed": next_index == 0
-            }
+    return jsonify({"error": "No words available"}), 500
+   
 
-    return jsonify(response)
 
 @app.route('/csv_summary')
 def csv_summary():

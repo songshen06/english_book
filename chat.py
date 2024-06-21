@@ -6,15 +6,43 @@ client = OpenAI(
     base_url = 'http://localhost:11434/v1',
     api_key='ollama', # required, but unused
 )
+'''
 def generate_answer(prompt):
     response = client.chat.completions.create(
-    model="qwen:14b-chat",
+    model="mistral:v0.3",
     messages=[
         {"role": "user", "content": prompt},
         {'role':'system', 'content':'你是一个英语老师，学生的回答会想你确认英文翻译的准确性。'},
     ]
     )
     message_content = response.choices[0].message.content
+    print("原始输出:", message_content)  # 输出模型的回答，用于调试
+    return message_content
+'''
+def generate_answer(english_word, chinese_translation):
+    prompt = f"""
+    You are an elementary school English teacher. Your task is to check if the provided Chinese translation of an English word is correct. If it is correct, mark it as "对" (correct). If it is incorrect, mark it as "错" (wrong). Additionally, provide a simple explanation of the word in Chinese along with an example sentence in English. Format the output strictly as a JSON object with two keys: "word" and "explanation".
+
+    Input:
+    - English word: {english_word}
+    - Chinese translation: {chinese_translation}
+
+    Output (strictly formatted as JSON):
+
+    {{
+      "Result": "对" or "错",
+      "explanation": "An explanation of the word in Chinese"
+      "sentence": "A simple example sentence using the word."
+    }}
+    """
+    response = client.chat.completions.create(
+        model="gemma:latest",
+        messages=[
+            {"role": "user", "content": prompt},
+            {'role': 'system', 'content': 'You are an elementary school English teacher and can speak English and Chinese.'},
+        ]
+    )
+    message_content = response.choices[0].message.content.strip()
     print("原始输出:", message_content)  # 输出模型的回答，用于调试
     return message_content
 
