@@ -4,83 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>English Word Test</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
     <style>
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-        color: #ffffff;
-      }
-      .container {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        text-align: center;
-        width: 80%;
-        max-width: 500px;
-      }
-      h1 {
-        margin-bottom: 20px;
-      }
-      h1 span {
+      /* 覆盖 currentWord 的样式 */
+      #currentWord {
         font-family: "Courier New", Courier, monospace;
         color: #00ffaa;
       }
-      label,
-      button,
-      input[type="submit"] {
-        margin-top: 10px;
-        display: block;
-        width: 100%;
-      }
-      input[type="text"] {
-        width: calc(100% - 20px);
-        padding: 10px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 5px;
-        font-family: "Courier New", Courier, monospace; /* 设置输入框的字体 */
-        font-size: 20px; /* 设置输入框的字体大小 */
-      }
-      button,
-      input[type="submit"] {
-        background-color: #00aaff;
-        color: #ffffff;
-        border: none;
-        padding: 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-      }
-      button:hover,
-      input[type="submit"]:hover {
-        background-color: #0088cc;
-      }
-      #resultDisplay {
+      /* 确保 extraInfo 部分的内容左对齐 */
+      #extraInfo {
+        text-align: left;
         margin-top: 20px;
-        font-weight: bold;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 10px;
-        border-radius: 5px;
-        text-align: left; /* 左对齐 */
-        font-size: 18px; /* 字体加大 */
       }
-      .label {
-        font-family: Arial, Helvetica, sans-serif;
-      }
-      .content {
-        font-family: "Courier New", Courier, monospace;
-        color: #00ffaa;
-      }
-      .hidden {
-        display: none;
+      #extraInfo p {
+        margin: 0;
       }
     </style>
   </head>
@@ -110,13 +50,25 @@
         View Summary
       </button>
       <div id="resultDisplay"></div>
+      <div id="extraInfo" class="hidden">
+        <p>
+          <span class="label">Explanation: </span
+          ><span class="content" id="explanation"></span>
+        </p>
+        <p>
+          <span class="label">Sentence: </span
+          ><span class="content" id="sentence"></span>
+        </p>
+      </div>
+      <div id="remainingWordsDisplay"></div>
+      <!-- 显示剩余单词数量 -->
     </div>
 
     <script>
       document.getElementById("wordForm").onsubmit = function (event) {
         event.preventDefault();
         var submitButton = document.getElementById("submitButton");
-        submitButton.disabled = true; // Disable the submit button to prevent multiple submissions
+        submitButton.disabled = true;
         var formData = new FormData(this);
 
         fetch(this.action, {
@@ -125,28 +77,31 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            submitButton.disabled = false; // Re-enable the submit button
+            submitButton.disabled = false;
             if (data.error) {
               alert(data.error);
             } else {
-              // 将结果、解释和句子显示在页面上
-              var resultText = `
-                            <span class="label">Result: </span><span class="content">${data.result}</span><br>
-                            <span class="label">Explanation: </span><span class="content">${data.explanation}</span><br>
-                            <span class="label">Sentence: </span><span class="content">${data.sentence}</span>
-                        `;
+              var resultText = `<span class="label">Result: </span><span class="content">${data.result}</span>`;
               document.getElementById("resultDisplay").innerHTML = resultText;
+              document.getElementById("explanation").textContent =
+                data.explanation;
+              document.getElementById("sentence").textContent = data.sentence;
+              document.getElementById("extraInfo").classList.remove("hidden");
+              document.getElementById(
+                "remainingWordsDisplay"
+              ).innerHTML = `<p>Remaining words: ${data.remaining_words}</p>`;
+
               if (data.test_completed) {
                 document
                   .getElementById("nextWordButton")
-                  .classList.add("hidden"); // 隐藏“下一单词”按钮
+                  .classList.add("hidden");
                 document
                   .getElementById("summaryButton")
-                  .classList.remove("hidden"); // 显示“查看总结”按钮
+                  .classList.remove("hidden");
               } else {
                 document
                   .getElementById("nextWordButton")
-                  .classList.remove("hidden"); // 显示“下一单词”按钮
+                  .classList.remove("hidden");
                 document.getElementById("nextWordButton").onclick =
                   function () {
                     loadNextWord(data.next_word);
@@ -155,7 +110,7 @@
             }
           })
           .catch((error) => {
-            submitButton.disabled = false; // Ensure the button is re-enabled in case of a fetch failure
+            submitButton.disabled = false;
             console.error("Error during fetch operation:", error);
             alert("An error occurred while submitting your response.");
           });
@@ -164,9 +119,11 @@
       function loadNextWord(next_word) {
         document.getElementById("currentWord").textContent = next_word;
         document.getElementById("english_word").value = next_word;
-        document.getElementById("chinese_word").value = ""; // Clear the input field
-        document.getElementById("resultDisplay").innerHTML = ""; // Clear the result display
-        document.getElementById("nextWordButton").classList.add("hidden"); // Hide the "Next Word" button
+        document.getElementById("chinese_word").value = "";
+        document.getElementById("resultDisplay").innerHTML = "";
+        document.getElementById("extraInfo").classList.add("hidden");
+        document.getElementById("remainingWordsDisplay").innerHTML = "";
+        document.getElementById("nextWordButton").classList.add("hidden");
       }
 
       function startDictation() {
@@ -179,7 +136,6 @@
         recognition.start();
       }
 
-      // Enable the "Next Word" button after the page loads
       document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("nextWordButton").disabled = false;
       });

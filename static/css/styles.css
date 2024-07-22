@@ -1,0 +1,101 @@
+/* 公共样式 */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+}
+
+.container,
+.login-container {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%;
+  max-width: 600px; /* 将宽度调整为最大值适应不同页面 */
+}
+
+h1,
+h2 {
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="submit"],
+button {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 18px;
+}
+
+button,
+input[type="submit"] {
+  background-color: #00aaff;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background-color: #0088cc;
+}
+
+a {
+  color: #00aaff;
+  text-decoration: none;
+  margin-top: 20px;
+  display: inline-block;
+}
+
+a:hover {
+  color: #0088cc;
+}
+
+/* 特定页面样式 */
+#resultDisplay {
+  margin-top: 20px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+  text-align: left;
+  font-size: 18px;
+}
+
+.label {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.content {
+  font-family: "Courier New", Courier, monospace;
+  color: #00ffaa;
+}
+
+.hidden {
+  display: none;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 10px 0;
+  text-align: left;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: 10px;
+}

@@ -715,8 +715,8 @@ def record_response(english_word, chinese_translation, response):
     result = "对" if "对" in response else "错"
     try:
         response_json = json.loads(response)
-        explanation = response_json.get('explanation', '')
-        sentence = response_json.get('sentence', '')
+        explanation = response_json.get('Explanation', '')
+        sentence = response_json.get('Sentence', '')
     except json.JSONDecodeError:
         explanation = ""
         sentence = ""
@@ -727,6 +727,7 @@ def record_response(english_word, chinese_translation, response):
         writer.writerow([now, english_word, chinese_translation, result, explanation, sentence])
     
     return result, explanation, sentence
+
 
 @app.route('/submit_word_test', methods=['POST'])
 def submit_word_test():
@@ -748,6 +749,7 @@ def submit_word_test():
         next_index = (session['index'] + 1) % len(english_words)
         session['index'] = next_index
         next_word = english_words[next_index]
+        remaining_words = len(english_words) - next_index - 1
 
         return jsonify({
             "current_word": english_word,
@@ -755,10 +757,12 @@ def submit_word_test():
             "explanation": explanation,
             "sentence": sentence,
             "next_word": next_word,
+            "remaining_words": remaining_words,
             "test_completed": next_index == 0
         })
 
     return jsonify({"error": "No words available"}), 500
+
    
 
 
